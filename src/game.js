@@ -3,6 +3,13 @@
 const GAME_W = 960; // chiều rộng khung hình
 const GAME_H = 540; // chiều cao khung hình
 const GROUND_Y = 480; // mặt trên của sàn chính
+const GRAVITY = 1400; // trọng lực
+const JUMP_HIGH = 165; // giữ phím: nhảy cao 165px (hơn cũ 20%)
+const JUMP_LOW = 82; // bấm nhanh: nhảy 82px (60% độ cao cũ)
+const JUMP_V = Math.sqrt(2 * GRAVITY * JUMP_HIGH); // lực bật để đạt độ cao tối đa
+const JUMP_TAP_MS = 110; // thả phím trong 0.11 giây thì tính là bấm nhanh
+const FONT = '"Chakra Petch", monospace'; // phông chữ thường (có dấu tiếng Việt)
+const FONT_TITLE = '"Bungee", "Chakra Petch", sans-serif'; // phông tiêu đề kiểu arcade
 const LEVEL_W = 8600; // chiều dài màn 1
 const ARENA_X = 7600; // mép trái phòng boss
 const ROLES = { verified: { maxHp: 5 }, dliever: { maxHp: 8 }, dcoded: { maxHp: 11 } }; // máu tối đa theo role
@@ -100,7 +107,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.setupInput(); // cài phím
     this.cameras.main.setBounds(0, 0, LEVEL_W, GAME_H); // giới hạn camera trong màn
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1); // camera bám nhân vật
-    const help = this.add.text(GAME_W / 2, 60, tr(`MÀN ${this.level}   `, `STAGE ${this.level}   `) + (this.scheme === 'wasd' ? tr('A D đi   W nhảy   J bắn   K L skill   Esc dừng', 'A D move   W jump   J shoot   K L skill   Esc pause') : tr('← → đi   ↑ nhảy   A bắn   S D skill   Esc dừng', '← → move   ↑ jump   A shoot   S D skill   Esc pause')), { fontFamily: 'monospace', fontSize: 18, color: '#aaddff', stroke: '#000', strokeThickness: 4 }).setOrigin(0.5).setScrollFactor(0).setDepth(100); // hướng dẫn phím đầu màn
+    const help = this.add.text(GAME_W / 2, 60, tr(`MÀN ${this.level}   `, `STAGE ${this.level}   `) + (this.scheme === 'wasd' ? tr('A D đi   W nhảy   J bắn   K L skill   P dừng', 'A D move   W jump   J shoot   K L skill   P pause') : tr('← → đi   ↑ nhảy   A bắn   S D skill   P dừng', '← → move   ↑ jump   A shoot   S D skill   P pause')), { fontFamily: FONT, fontSize: 18, color: '#aaddff', stroke: '#000', strokeThickness: 4 }).setOrigin(0.5).setScrollFactor(0).setDepth(100); // hướng dẫn phím đầu màn
     this.tweens.add({ targets: help, alpha: 0, delay: 5000, duration: 800 }); // mờ dần sau 5 giây
     this.boss = null; // chưa có boss
     this.bossStarted = false; // chưa vào phòng boss
@@ -115,9 +122,9 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.sound.stopAll(); // tắt âm thanh còn sót khi chơi lại
     if (this.registry.get('musicOn') === undefined) this.registry.set('musicOn', loadFlag('musicOn')); // đọc cài đặt nhạc đã lưu
     if (this.registry.get('sfxOn') === undefined) this.registry.set('sfxOn', loadFlag('sfxOn')); // đọc cài đặt SFX đã lưu
-    this.music = this.sound.add(this.lv.music, { loop: true, volume: 0.35 }); // nhạc nền lặp theo màn
+    this.music = this.sound.add(this.lv.music, { loop: true, volume: 0.35 * musicVol() }); // nhạc nền lặp theo màn, nhân âm lượng người chơi chỉnh
     if (this.registry.get('musicOn')) this.music.play(); // bật nhạc nếu đang cho phép
-    const style = { fontFamily: 'monospace', fontSize: 16, color: '#ffffff', backgroundColor: '#12122a', padding: { x: 8, y: 5 } }; // kiểu nút
+    const style = { fontFamily: FONT, fontSize: 16, color: '#ffffff', backgroundColor: '#12122a', padding: { x: 8, y: 5 } }; // kiểu nút
     const musicBtn = this.add.text(GAME_W - 16, 12, '', style).setOrigin(1, 0).setScrollFactor(0).setDepth(150).setInteractive({ useHandCursor: true }); // nút nhạc góc phải
     const sfxBtn = this.add.text(GAME_W - 16, 44, '', style).setOrigin(1, 0).setScrollFactor(0).setDepth(150).setInteractive({ useHandCursor: true }); // nút SFX ngay dưới
     const refresh = () => { // cập nhật chữ trên nút
@@ -132,7 +139,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       if (on) { if (this.music.isPaused) this.music.resume(); else if (!this.music.isPlaying) this.music.play(); } else this.music.pause(); // bật hoặc tạm dừng nhạc
       refresh(); // cập nhật chữ
     });
-    const pauseBtn = this.add.text(GAME_W - 16, 76, tr('Dừng (Esc)', 'Pause (Esc)'), style).setOrigin(1, 0).setScrollFactor(0).setDepth(150).setInteractive({ useHandCursor: true }); // nút tạm dừng
+    const pauseBtn = this.add.text(GAME_W - 16, 76, tr('Dừng (P)', 'Pause (P)'), style).setOrigin(1, 0).setScrollFactor(0).setDepth(150).setInteractive({ useHandCursor: true }); // nút tạm dừng
     pauseBtn.on('pointerdown', () => this.togglePause()); // bấm thì tạm dừng hoặc chơi tiếp
     sfxBtn.on('pointerdown', () => { // bấm nút SFX
       const on = !this.registry.get('sfxOn'); // đảo trạng thái
@@ -143,7 +150,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   }
 
   sfx(key, volume = 0.5) { // phát 1 hiệu ứng âm thanh nếu SFX đang bật
-    if (this.registry.get('sfxOn')) this.sound.play(key, { volume }); // phát âm thanh
+    if (this.registry.get('sfxOn')) this.sound.play(key, { volume: volume * sfxVol() }); // phát âm thanh theo âm lượng người chơi chỉnh
   }
 
   makeAnims() { // tạo animation cho nhân vật và quái
@@ -290,13 +297,14 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.keys = this.input.keyboard.addKeys(map); // tạo các phím theo bảng
     this.keyR = this.input.keyboard.addKey('R'); // phím R chơi lại
     this.keyEnter = this.input.keyboard.addKey('ENTER'); // phím Enter sang màn sau
-    this.keyEsc = this.input.keyboard.addKey('ESC'); // phím Esc tạm dừng
+    this.keyPause = this.input.keyboard.addKey('P'); // phím P tạm dừng
+    this.keyEsc = this.input.keyboard.addKey('ESC'); // Esc cũng tạm dừng được
     this.keyM = this.input.keyboard.addKey('M'); // phím M về menu
   }
 
   update(time) { // chạy mỗi khung hình
     this.bg.tilePositionX = this.cameras.main.scrollX * 0.3 / this.bg.tileScaleX; // nền cuộn chậm hơn (parallax)
-    if (Phaser.Input.Keyboard.JustDown(this.keyEsc) && !this.dead && !this.levelOver) this.togglePause(); // Esc tạm dừng hoặc chơi tiếp
+    if ((Phaser.Input.Keyboard.JustDown(this.keyPause) || Phaser.Input.Keyboard.JustDown(this.keyEsc)) && !this.dead && !this.levelOver) this.togglePause(); // P (hoặc Esc) tạm dừng hoặc chơi tiếp
     if (this.keyM.isDown && (this.paused || this.dead || this.levelOver)) { this.goMenu(); return; } // M về menu
     if (this.paused) return; // đang dừng thì không cập nhật gì
     if (this.keyR.isDown && (this.dead || this.levelOver)) { this.retry(); return; } // thua hoặc thắng thì bấm R chơi lại màn này
@@ -330,10 +338,14 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       if (this.keys.left.isDown || this.touch.left) { body.setVelocityX(-220); this.facing = -1; } // đi trái
       else if (this.keys.right.isDown || this.touch.right) { body.setVelocityX(220); this.facing = 1; } // đi phải
       else body.setVelocityX(0); // đứng yên
-      if (this.pressed('jump') && onGround) { body.setVelocityY(-620); this.jumpCut = true; this.sfx('jump', 0.3); this.jumpFx(); } // nhảy khi đang đứng đất (lực tối đa)
+      if (this.pressed('jump') && onGround) { body.setVelocityY(-JUMP_V); this.jumpCut = true; this.jumpY0 = body.bottom; this.jumpT0 = time; this.sfx('jump', 0.3); this.jumpFx(); } // nhảy khi đang đứng đất (lực tối đa)
       const jumpHeld = this.keys.jump.isDown || this.touch.jump; // còn giữ phím nhảy không
-      if (this.jumpCut && !jumpHeld && body.velocity.y < 0) { body.setVelocityY(body.velocity.y * 0.4); this.jumpCut = false; } // thả phím sớm khi đang bay lên thì hãm lại: bấm nhẹ nhảy thấp, giữ lâu nhảy cao
-      if (body.velocity.y >= 0) this.jumpCut = false; // đã qua đỉnh thì thôi xét
+      if (this.jumpCut && !jumpHeld && time - this.jumpT0 < JUMP_TAP_MS) { // thả phím ngay: nhảy thấp
+        const left = JUMP_LOW - (this.jumpY0 - body.bottom); // độ cao còn thiếu để đạt mức thấp
+        body.setVelocityY(left > 0 ? -Math.sqrt(2 * GRAVITY * left) : 0); // đặt lại lực để đỉnh nhảy đúng mức thấp
+        this.jumpCut = false; // đã quyết định mức nhảy
+      }
+      if (time - this.jumpT0 >= JUMP_TAP_MS) this.jumpCut = false; // giữ đủ lâu: nhảy cao hết mức
     }
     if ((this.keys.shoot.isDown || this.touch.shoot) && time > this.shootReadyAt) this.playerShoot(time); // giữ phím bắn để bắn liên tục có nhịp
     if (this.hasSkill1 && this.pressed('skill1') && time > this.skill1ReadyAt) this.playerFan(time); // dùng skill 5 tia khi đã hồi xong
@@ -410,15 +422,55 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       this.tweens.pauseAll(); // dừng tween
       this.anims.pauseAll(); // dừng animation
       if (this.music.isPlaying) this.music.pause(); // dừng nhạc
-      this.pauseText = this.showCenterText(tr('TẠM DỪNG\nEsc / chạm: chơi tiếp\nM: về menu', 'PAUSED\nEsc / tap: resume\nM: menu'), '#ffffff', () => this.togglePause()); // chữ tạm dừng
+      this.buildPauseMenu(); // hiện bảng tạm dừng có chỉnh âm lượng
     } else { // chơi tiếp
       this.physics.world.resume(); // chạy vật lý
       this.time.paused = false; // chạy đồng hồ
       this.tweens.resumeAll(); // chạy tween
       this.anims.resumeAll(); // chạy animation
       if (this.music.isPaused && this.registry.get('musicOn')) this.music.resume(); // chạy nhạc nếu đang bật
-      if (this.pauseText) this.pauseText.destroy(); // xoá chữ tạm dừng
+      for (const o of this.pauseUi || []) o.destroy(); // xoá bảng tạm dừng
+      this.pauseUi = []; // làm rỗng danh sách
     }
+  }
+
+  buildPauseMenu() { // bảng tạm dừng: tiêu đề, 2 thanh âm lượng, hướng dẫn
+    const ui = this.pauseUi = []; // các thành phần để xoá khi chơi tiếp
+    const add = (o) => { ui.push(o.setScrollFactor(0).setDepth(210)); return o; }; // thêm vào bảng, cố định theo camera
+    add(this.add.rectangle(GAME_W / 2, GAME_H / 2, 520, 330, 0x0a0a1c, 0.92).setStrokeStyle(3, this.lv.neon)); // khung nền bảng
+    add(this.add.text(GAME_W / 2, 135, tr('TẠM DỪNG', 'PAUSED'), { fontFamily: FONT_TITLE, fontSize: 32, color: '#ffffff', stroke: '#000', strokeThickness: 6 }).setOrigin(0.5).setPadding(12 + 6).setShadow(0, 0, '#ffffff', 12, true, true)); // tiêu đề
+    this.makeSlider(215, tr('Nhạc', 'Music'), 'musicVol', (v) => { this.music.setVolume(0.35 * v); }); // thanh âm lượng nhạc
+    this.makeSlider(280, tr('Hiệu ứng', 'Effects'), 'sfxVol', null); // thanh âm lượng hiệu ứng (thả tay thì phát thử)
+    const resume = add(this.add.text(GAME_W / 2, 350, tr('▶ Chơi tiếp (P)', '▶ Resume (P)'), { fontFamily: FONT, fontSize: 22, color: '#ffffff', backgroundColor: '#2a4a8a', padding: { x: 16, y: 8 } }).setOrigin(0.5).setInteractive({ useHandCursor: true })); // nút chơi tiếp
+    resume.on('pointerdown', () => this.togglePause()); // bấm thì chơi tiếp
+    const menu = add(this.add.text(GAME_W / 2, 400, tr('Về menu (M)', 'Menu (M)'), { fontFamily: FONT, fontSize: 16, color: '#aaaacc' }).setOrigin(0.5).setInteractive({ useHandCursor: true })); // nút về menu
+    menu.on('pointerdown', () => this.goMenu()); // bấm thì về menu
+  }
+
+  makeSlider(y, label, key, onChange) { // 1 thanh kéo âm lượng 0-100%
+    const x0 = GAME_W / 2 - 90, w = 240; // mép trái và độ dài thanh
+    const add = (o) => { this.pauseUi.push(o.setScrollFactor(0).setDepth(211)); return o; }; // thêm vào bảng tạm dừng
+    let v = key === 'musicVol' ? musicVol() : sfxVol(); // giá trị hiện tại
+    add(this.add.text(x0 - 20, y, label, { fontFamily: FONT, fontSize: 18, color: '#ffffff' }).setOrigin(1, 0.5)); // nhãn bên trái
+    const bar = add(this.add.rectangle(x0, y, w, 10, 0x333355).setOrigin(0, 0.5).setInteractive({ useHandCursor: true })); // rãnh thanh
+    const fill = add(this.add.rectangle(x0, y, w * v, 10, this.lv.neon).setOrigin(0, 0.5)); // phần đã chọn
+    const knob = add(this.add.circle(x0 + w * v, y, 13, 0xffffff).setStrokeStyle(3, this.lv.neon).setInteractive({ draggable: true, useHandCursor: true })); // núm kéo
+    const pct = add(this.add.text(x0 + w + 18, y, '', { fontFamily: FONT, fontSize: 18, color: '#ffffff' }).setOrigin(0, 0.5)); // số phần trăm
+    const set = (px) => { // đặt giá trị theo toạ độ ngón tay/chuột
+      v = Phaser.Math.Clamp((px - x0) / w, 0, 1); // đổi toạ độ ra 0-1
+      knob.x = x0 + w * v; // dời núm
+      fill.width = w * v; // tô phần đã chọn
+      pct.setText(`${Math.round(v * 100)}%`); // hiện phần trăm
+      this.registry.set(key, v); // dùng ngay trong game
+      saveNum(key, Math.round(v * 100)); // lưu vào trình duyệt
+      if (onChange) onChange(v); // cập nhật nhạc đang phát
+    };
+    set(x0 + w * v); // hiện giá trị ban đầu
+    bar.on('pointerdown', (p) => set(p.x)); // bấm vào rãnh thì nhảy tới đó
+    knob.on('drag', (p) => set(p.x)); // kéo núm
+    const preview = () => { if (key === 'sfxVol' && this.registry.get('sfxOn')) this.sound.play('pickup', { volume: 0.5 * v }); }; // phát thử tiếng hiệu ứng
+    bar.on('pointerup', preview); // thả tay trên rãnh thì phát thử
+    knob.on('dragend', preview); // thả núm thì phát thử
   }
 
   retry() { // chơi lại màn này
@@ -441,17 +493,17 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   createHud() { // HUD: máu, icon skill, tiến độ màn
     const d = 100; // độ sâu vẽ HUD
     const neonHex = '#' + this.lv.neon.toString(16).padStart(6, '0'); // màu chữ theo màn
-    this.hudLabel = this.add.text(16, 8, '', { fontFamily: 'monospace', fontSize: 16, color: neonHex, stroke: '#000', strokeThickness: 3 }).setScrollFactor(0).setDepth(d); // nhãn màn và role
+    this.hudLabel = this.add.text(16, 8, '', { fontFamily: FONT, fontSize: 16, color: neonHex, stroke: '#000', strokeThickness: 3 }).setScrollFactor(0).setDepth(d); // nhãn màn và role
     this.add.rectangle(16, 32, 204, 16, 0x000000).setOrigin(0).setStrokeStyle(2, 0xffffff).setScrollFactor(0).setDepth(d); // khung thanh máu
     this.hpFill = this.add.rectangle(18, 34, 200, 12, 0x44ff66).setOrigin(0).setScrollFactor(0).setDepth(d); // thanh máu
-    this.hpNum = this.add.text(228, 30, '', { fontFamily: 'monospace', fontSize: 16, color: '#ffffff', stroke: '#000', strokeThickness: 3 }).setScrollFactor(0).setDepth(d); // số máu
+    this.hpNum = this.add.text(228, 30, '', { fontFamily: FONT, fontSize: 16, color: '#ffffff', stroke: '#000', strokeThickness: 3 }).setScrollFactor(0).setDepth(d); // số máu
     this.cdUi = []; // danh sách nút có hiển thị hồi chiêu
     if (!this.sys.game.device.input.touch) { // máy tính: 2 icon skill dưới thanh máu
       const wasd = this.scheme === 'wasd'; // kiểu điều khiển
       [['fan', wasd ? 'K' : 'S', 1], ['dash', wasd ? 'L' : 'D', 2]].forEach(([icon, key, n], i) => { // skill 1 và 2
         const x = 44 + i * 64, y = 84, r = 26; // tâm và bán kính icon
         const img = this.add.image(x, y, `icon_${icon}`).setDisplaySize(r * 2, r * 2).setScrollFactor(0).setDepth(d); // hình icon
-        const keyTxt = this.add.text(x, y + r + 9, `[${key}]`, { fontFamily: 'monospace', fontSize: 12, color: '#ccccee', stroke: '#000', strokeThickness: 3 }).setOrigin(0.5).setScrollFactor(0).setDepth(d); // phím bấm dưới icon
+        const keyTxt = this.add.text(x, y + r + 9, `[${key}]`, { fontFamily: FONT, fontSize: 12, color: '#ccccee', stroke: '#000', strokeThickness: 3 }).setOrigin(0.5).setScrollFactor(0).setDepth(d); // phím bấm dưới icon
         this.addCdUi(x, y, r, [img, keyTxt], n); // gắn vòng hồi chiêu
       });
     }
@@ -471,7 +523,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
 
   addCdUi(x, y, r, parts, n) { // tạo lớp phủ hồi chiêu cho 1 nút (n: 0 bắn, 1 skill 5 tia, 2 skill lao)
     const g = this.add.graphics().setScrollFactor(0).setDepth(170); // lớp phủ tối hình quạt
-    const txt = this.add.text(x, y, '', { fontFamily: 'monospace', fontSize: Math.round(r * 0.75), color: '#ffffff', stroke: '#000', strokeThickness: 4 }).setOrigin(0.5).setScrollFactor(0).setDepth(171); // số giây hồi
+    const txt = this.add.text(x, y, '', { fontFamily: FONT, fontSize: Math.round(r * 0.75), color: '#ffffff', stroke: '#000', strokeThickness: 4 }).setOrigin(0.5).setScrollFactor(0).setDepth(171); // số giây hồi
     this.cdUi.push({ x, y, r, parts, n, g, txt }); // lưu lại để cập nhật mỗi khung
   }
 
@@ -496,7 +548,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.input.addPointer(3); // cho phép chạm nhiều ngón cùng lúc
     const mk = (x, y, r, name, label, icon, n) => { // tạo 1 nút tròn (có icon thì vẽ icon)
       const c = this.add.circle(x, y, r, 0xffffff, icon ? 0.001 : 0.15).setStrokeStyle(icon ? 0 : 2, 0xffffff, 0.6).setScrollFactor(0).setDepth(160).setInteractive(); // vùng chạm
-      const face = icon ? this.add.image(x, y, `icon_${icon}`).setDisplaySize(r * 2, r * 2) : this.add.text(x, y, label, { fontFamily: 'monospace', fontSize: 26, color: '#ffffff' }).setOrigin(0.5); // icon hoặc chữ
+      const face = icon ? this.add.image(x, y, `icon_${icon}`).setDisplaySize(r * 2, r * 2) : this.add.text(x, y, label, { fontFamily: FONT, fontSize: 26, color: '#ffffff' }).setOrigin(0.5); // icon hoặc chữ
       face.setScrollFactor(0).setDepth(161); // cố định theo camera
       const base = face.scale; // cỡ gốc để nhún khi bấm
       c.on('pointerdown', () => { this.touch[name] = true; this.touch[name + 'Tap'] = true; face.setScale(base * 0.88); if (!icon) c.setFillStyle(0xffffff, 0.4); }); // chạm vào nút
@@ -539,9 +591,9 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     const b = this.pBullets.create(this.player.x + this.facing * 28, this.player.y - 4, 'bullet_player').setScale(0.1); // tạo viên đạn trước mặt
     b.setFlipX(this.facing < 0); // quay đạn theo hướng bắn
     b.body.setAllowGravity(false); // đạn bay thẳng
-    b.setVelocityX(this.facing * 650); // tốc độ đạn
+    b.setVelocityX(this.facing * 820); // tốc độ đạn (nhanh hơn)
     this.sfx('shoot', 0.25); // tiếng bắn
-    this.time.delayedCall(900, () => b.destroy()); // đạn tự biến mất sau 0.9 giây
+    this.time.delayedCall(1150, () => b.destroy()); // đạn tự biến mất sau 1.15 giây (bay xa hơn)
   }
 
   playerFan(time) { // skill 5 tia của Dliever
@@ -635,7 +687,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   }
 
   showCenterText(msg, color, onTap) { // hiện chữ lớn giữa màn hình, chạm được trên mobile
-    const t = this.add.text(GAME_W / 2, GAME_H / 2, msg, { fontFamily: 'monospace', fontSize: 36, color, align: 'center', stroke: '#000', strokeThickness: 6 }).setOrigin(0.5).setScrollFactor(0).setDepth(200); // chữ cố định theo camera
+    const t = this.add.text(GAME_W / 2, GAME_H / 2, msg, { fontFamily: FONT_TITLE, fontSize: 32, color, align: 'center', stroke: '#000', strokeThickness: 6, lineSpacing: 6 }).setPadding(14 + 6).setShadow(0, 0, color, 14, true, true).setOrigin(0.5).setScrollFactor(0).setDepth(200); // chữ cố định theo camera
     if (onTap) t.setInteractive({ useHandCursor: true }).on('pointerdown', onTap); // chạm vào chữ để thực hiện
     return t; // trả về chữ
   }
@@ -756,7 +808,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     });
     this.bossBarBg = this.add.rectangle(GAME_W / 2, GAME_H - 28, 504, 18, 0x000000).setStrokeStyle(2, this.lv.neon).setScrollFactor(0).setDepth(100); // khung thanh máu boss
     this.bossBar = this.add.rectangle(GAME_W / 2 - 250, GAME_H - 28, 500, 12, this.lv.neon).setOrigin(0, 0.5).setScrollFactor(0).setDepth(101); // thanh máu boss
-    this.add.text(GAME_W / 2, GAME_H - 52, key.toUpperCase(), { fontFamily: 'monospace', fontSize: 16, color: '#' + this.lv.neon.toString(16).padStart(6, '0') }).setOrigin(0.5).setScrollFactor(0).setDepth(101); // tên boss
+    this.add.text(GAME_W / 2, GAME_H - 52, key.toUpperCase(), { fontFamily: FONT, fontSize: 16, color: '#' + this.lv.neon.toString(16).padStart(6, '0') }).setOrigin(0.5).setScrollFactor(0).setDepth(101); // tên boss
     this.time.delayedCall(1200, () => this.bossNext()); // boss bắt đầu đánh sau 1.2 giây
   }
 
@@ -957,7 +1009,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       b.spr.destroy(); // boss biến mất
       this.cameras.main.flash(500, 255, 255, 255); // chớp trắng cả màn
       this.sfx('win', 0.6); // âm thanh thắng
-      if (this.registry.get('musicOn')) this.time.delayedCall(1500, () => this.sound.play('music_win', { volume: 0.4 })); // nhạc thắng sau jingle
+      if (this.registry.get('musicOn')) this.time.delayedCall(1500, () => this.sound.play('music_win', { volume: 0.4 * musicVol() })); // nhạc thắng sau jingle
       this.bossBar.width = 0; // thanh máu về 0
     });
     if (b.key === 'dco') { this.time.delayedCall(4700, () => this.finalWin()); return; } // trùm cuối: sang màn chiến thắng
@@ -976,6 +1028,10 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
 let LANG = (() => { try { return localStorage.getItem('lang') === 'en' ? 'en' : 'vi'; } catch (e) { return 'vi'; } })(); // ngôn ngữ đang dùng, đọc từ trình duyệt
 
 function tr(vi, en) { return LANG === 'en' ? en : vi; } // chọn chữ theo ngôn ngữ
+
+function musicVol() { const v = game.registry.get('musicVol'); return v !== undefined ? v : loadNum('musicVol', 100) / 100; } // âm lượng nhạc 0-1 (mặc định 100%)
+
+function sfxVol() { const v = game.registry.get('sfxVol'); return v !== undefined ? v : loadNum('sfxVol', 100) / 100; } // âm lượng hiệu ứng 0-1 (mặc định 100%)
 
 function loadFlag(name) { // đọc cài đặt bật/tắt từ trình duyệt, mặc định bật
   try { return localStorage.getItem(name) !== '0'; } catch (e) { return true; } // lỗi bộ nhớ thì coi như bật
@@ -1001,10 +1057,10 @@ class MenuScene extends Phaser.Scene { // màn tiêu đề: chọn điều khi�
     let scheme = this.registry.get('scheme') || (loadNum('scheme', 1) === 2 ? 'wasd' : 'arrows'); // kiểu điều khiển đã lưu
     this.registry.set('scheme', scheme); // dùng chung cho các cảnh
     const unlocked = Phaser.Math.Clamp(loadNum('unlocked', 1), 1, 3); // số màn đã mở khóa
-    this.add.text(GAME_W / 2, 60, 'Dlicom: Journey to DCO', { fontFamily: 'monospace', fontSize: 42, color: '#88ccff', stroke: '#000', strokeThickness: 6 }).setOrigin(0.5); // tên game
-    this.add.text(GAME_W / 2, 105, tr('Từ Verified tay trắng, leo từng role lên tới DCO', 'Start as Verified, climb every role up to DCO'), { fontFamily: 'monospace', fontSize: 16, color: '#aaaacc' }).setOrigin(0.5); // mô tả ngắn
-    this.add.text(GAME_W / 2, 150, tr('Điều khiển (phím C để đổi)', 'Controls (press C to switch)'), { fontFamily: 'monospace', fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // tiêu đề chọn điều khiển
-    const style = { fontFamily: 'monospace', fontSize: 16, color: '#ffffff', align: 'center', backgroundColor: '#12122a', padding: { x: 14, y: 10 } }; // kiểu nút
+    this.add.text(GAME_W / 2, 60, 'Dlicom: Journey to DCO', { fontFamily: FONT_TITLE, fontSize: 40, color: '#88ccff', stroke: '#000', strokeThickness: 6 }).setPadding(18 + 6).setShadow(0, 0, '#3399ff', 18, true, true).setOrigin(0.5); // tên game
+    this.add.text(GAME_W / 2, 105, tr('Từ Verified tay trắng, leo từng role lên tới DCO', 'Start as Verified, climb every role up to DCO'), { fontFamily: FONT, fontSize: 16, color: '#aaaacc' }).setOrigin(0.5); // mô tả ngắn
+    this.add.text(GAME_W / 2, 150, tr('Điều khiển (phím C để đổi)', 'Controls (press C to switch)'), { fontFamily: FONT, fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // tiêu đề chọn điều khiển
+    const style = { fontFamily: FONT, fontSize: 16, color: '#ffffff', align: 'center', backgroundColor: '#12122a', padding: { x: 14, y: 10 } }; // kiểu nút
     const schemeBtns = [['arrows', tr('Mũi tên\n← → đi  ↑ nhảy\nA bắn  S D skill', 'Arrow keys\n← → move  ↑ jump\nA shoot  S D skill')], ['wasd', tr('Kiểu FPS\nA D đi  W nhảy\nJ bắn  K L skill', 'FPS style\nA D move  W jump\nJ shoot  K L skill')]].map(([sc, label], i) => { // 2 nút điều khiển
       const b = this.add.text(GAME_W / 2 + (i === 0 ? -150 : 150), 215, label, style).setOrigin(0.5).setInteractive({ useHandCursor: true }); // nút
       b.on('pointerdown', () => setScheme(sc)); // bấm thì chọn
@@ -1017,24 +1073,24 @@ class MenuScene extends Phaser.Scene { // màn tiêu đề: chọn điều khi�
       for (const [k, b] of schemeBtns) b.setBackgroundColor(k === sc ? '#2a4a8a' : '#12122a'); // tô nút đang chọn
     };
     setScheme(scheme); // tô lần đầu
-    this.add.text(GAME_W / 2, 300, tr('Chọn màn (phím 1 2 3)', 'Select stage (keys 1 2 3)'), { fontFamily: 'monospace', fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // tiêu đề chọn màn
+    this.add.text(GAME_W / 2, 300, tr('Chọn màn (phím 1 2 3)', 'Select stage (keys 1 2 3)'), { fontFamily: FONT, fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // tiêu đề chọn màn
     const info = [[tr('Màn 1', 'Stage 1'), 'Boss Dliever', '#3399ff'], [tr('Màn 2', 'Stage 2'), 'Boss Dcoded', '#ffcc33'], [tr('Màn 3', 'Stage 3'), 'Boss DCO', '#ff44cc']]; // thông tin 3 màn
     info.forEach(([name, boss, color], i) => { // vẽ 3 nút màn
       const open = i + 1 <= unlocked; // đã mở khóa chưa
       const b = this.add.text(GAME_W / 2 + (i - 1) * 220, 370, open ? `${name}\n${boss}` : `${name}\n${tr('KHÓA', 'LOCKED')}`, { ...style, fontSize: 20, color: open ? color : '#555566' }).setOrigin(0.5); // nút màn
       if (open) { b.setInteractive({ useHandCursor: true }); b.on('pointerdown', () => this.startLevel(i + 1)); } // mở rồi thì bấm được
     });
-    if (unlocked > 1) this.add.text(GAME_W / 2, 425, tr(`Tiến độ đã lưu: mở tới màn ${unlocked}`, `Progress saved: stage ${unlocked} unlocked`), { fontFamily: 'monospace', fontSize: 14, color: '#88ff99' }).setOrigin(0.5); // báo có tiến độ lưu
-    this.add.text(GAME_W / 2, 505, tr('Âm thanh: Kenney.nl (CC0), nhạc: Juhani Junkala (CC0)', 'SFX: Kenney.nl (CC0), music: Juhani Junkala (CC0)'), { fontFamily: 'monospace', fontSize: 13, color: '#666688' }).setOrigin(0.5); // credit âm thanh
+    if (unlocked > 1) this.add.text(GAME_W / 2, 425, tr(`Tiến độ đã lưu: mở tới màn ${unlocked}`, `Progress saved: stage ${unlocked} unlocked`), { fontFamily: FONT, fontSize: 14, color: '#88ff99' }).setOrigin(0.5); // báo có tiến độ lưu
+    this.add.text(GAME_W / 2, 505, tr('Âm thanh: Kenney.nl (CC0), nhạc: Juhani Junkala (CC0)', 'SFX: Kenney.nl (CC0), music: Juhani Junkala (CC0)'), { fontFamily: FONT, fontSize: 13, color: '#666688' }).setOrigin(0.5); // credit âm thanh
     this.input.keyboard.on('keydown-ONE', () => this.startLevel(1)); // phím 1 vào màn 1
     this.input.keyboard.on('keydown-TWO', () => { if (unlocked >= 2) this.startLevel(2); }); // phím 2 vào màn 2 nếu đã mở
     this.input.keyboard.on('keydown-THREE', () => { if (unlocked >= 3) this.startLevel(3); }); // phím 3 vào màn 3 nếu đã mở
     this.input.keyboard.on('keydown-C', () => setScheme(scheme === 'wasd' ? 'arrows' : 'wasd')); // phím C đổi điều khiển
-    const langBtn = this.add.text(GAME_W - 16, 14, LANG === 'en' ? '[ EN ] / VI' : '[ VI ] / EN', { fontFamily: 'monospace', fontSize: 18, color: '#ffffff', backgroundColor: '#2a4a8a', padding: { x: 10, y: 6 } }).setOrigin(1, 0).setInteractive({ useHandCursor: true }); // nút đổi ngôn ngữ góc phải
+    const langBtn = this.add.text(GAME_W - 16, 14, LANG === 'en' ? '[ EN ] / VI' : '[ VI ] / EN', { fontFamily: FONT, fontSize: 18, color: '#ffffff', backgroundColor: '#2a4a8a', padding: { x: 10, y: 6 } }).setOrigin(1, 0).setInteractive({ useHandCursor: true }); // nút đổi ngôn ngữ góc phải
     const toggleLang = () => { LANG = LANG === 'en' ? 'vi' : 'en'; try { localStorage.setItem('lang', LANG); } catch (e) { /* lỗi bộ nhớ thì bỏ qua */ } this.scene.restart(); }; // đổi ngôn ngữ, lưu lại, vẽ lại menu
     langBtn.on('pointerdown', toggleLang); // bấm nút thì đổi
     this.input.keyboard.on('keydown-L', toggleLang); // phím L đổi ngôn ngữ
-    this.add.text(GAME_W - 16, 50, tr('Ngôn ngữ (L)', 'Language (L)'), { fontFamily: 'monospace', fontSize: 12, color: '#8888aa' }).setOrigin(1, 0); // chú thích dưới nút
+    this.add.text(GAME_W - 16, 50, tr('Ngôn ngữ (L)', 'Language (L)'), { fontFamily: FONT, fontSize: 12, color: '#8888aa' }).setOrigin(1, 0); // chú thích dưới nút
   }
 
   startLevel(n) { // vào màn n
@@ -1049,21 +1105,22 @@ class WinScene extends Phaser.Scene { // màn chiến thắng cuối game
 
   create() { // dựng màn thắng
     this.cameras.main.fadeIn(800, 255, 255, 255); // hiện dần từ trắng
-    if (this.registry.get('musicOn')) this.sound.play('music_win', { volume: 0.5 }); // nhạc thắng
-    this.add.text(GAME_W / 2, 70, tr('BẠN ĐÃ LÊN ROLE DCO!', 'YOU REACHED THE DCO ROLE!'), { fontFamily: 'monospace', fontSize: 38, color: '#ff66cc', stroke: '#000', strokeThickness: 6 }).setOrigin(0.5); // chữ chiến thắng
-    this.add.text(GAME_W / 2, 115, 'Verified → Dliever → Dcoded → DCO', { fontFamily: 'monospace', fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // hành trình
+    if (this.registry.get('musicOn')) this.sound.play('music_win', { volume: 0.5 * musicVol() }); // nhạc thắng
+    this.add.text(GAME_W / 2, 70, tr('BẠN ĐÃ LÊN ROLE DCO!', 'YOU REACHED THE DCO ROLE!'), { fontFamily: FONT_TITLE, fontSize: 34, color: '#ff66cc', stroke: '#000', strokeThickness: 6 }).setPadding(18 + 6).setShadow(0, 0, '#ff44cc', 18, true, true).setOrigin(0.5); // chữ chiến thắng
+    this.add.text(GAME_W / 2, 115, 'Verified → Dliever → Dcoded → DCO', { fontFamily: FONT, fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // hành trình
     const spr = this.add.sprite(GAME_W / 2, 330, 'dco_idle_1').setOrigin(0.5, 1).setScale(0.9); // DCO đứng giữa màn
     spr.play('dco_idle'); // DCO thở
     this.add.particles(GAME_W / 2, 0, 'px', { x: { min: -480, max: 480 }, speedY: { min: 60, max: 160 }, lifespan: 4000, tint: [0xff44cc, 0x3399ff, 0xffcc33], frequency: 60 }); // mưa pháo giấy 3 màu
-    this.add.text(GAME_W / 2, 400, tr('Credit\nGame: làm cho Dlicom AI Game Jam\nSFX: Kenney.nl (CC0)\nNhạc: Juhani Junkala - 5 Action Chiptunes (CC0)', 'Credits\nGame: made for the Dlicom AI Game Jam\nSFX: Kenney.nl (CC0)\nMusic: Juhani Junkala - 5 Action Chiptunes (CC0)'), { fontFamily: 'monospace', fontSize: 15, color: '#aaaacc', align: 'center' }).setOrigin(0.5); // credit
-    this.add.text(GAME_W / 2, 505, tr('Enter / chạm: về menu', 'Enter / tap: back to menu'), { fontFamily: 'monospace', fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // hướng dẫn
+    this.add.text(GAME_W / 2, 400, tr('Credit\nGame: làm cho Dlicom AI Game Jam\nSFX: Kenney.nl (CC0)\nNhạc: Juhani Junkala - 5 Action Chiptunes (CC0)', 'Credits\nGame: made for the Dlicom AI Game Jam\nSFX: Kenney.nl (CC0)\nMusic: Juhani Junkala - 5 Action Chiptunes (CC0)'), { fontFamily: FONT, fontSize: 15, color: '#aaaacc', align: 'center' }).setOrigin(0.5); // credit
+    this.add.text(GAME_W / 2, 505, tr('Enter / chạm: về menu', 'Enter / tap: back to menu'), { fontFamily: FONT, fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // hướng dẫn
     const back = () => { this.sound.stopAll(); this.scene.start('Menu'); }; // về menu
     this.input.keyboard.once('keydown-ENTER', back); // Enter về menu
     this.time.delayedCall(800, () => this.input.once('pointerdown', back)); // chạm về menu (chờ chút để khỏi bấm nhầm)
   }
 }
 
-new Phaser.Game({ // khởi tạo game
+const fontsReady = document.fonts ? Promise.race([Promise.all(['16px "Chakra Petch"', '700 16px "Chakra Petch"', '16px "Bungee"'].map(f => document.fonts.load(f))), new Promise(r => setTimeout(r, 3000))]) : Promise.resolve(); // đợi phông tối đa 3 giây
+fontsReady.catch(() => {}).then(() => { window.game = new Phaser.Game({ // khởi tạo game sau khi có phông
   type: Phaser.AUTO, // tự chọn WebGL hoặc Canvas
   parent: 'game', // gắn vào thẻ div#game
   width: GAME_W, // chiều rộng logic
@@ -1071,6 +1128,6 @@ new Phaser.Game({ // khởi tạo game
   backgroundColor: '#05050c', // màu nền
   pixelArt: true, // giữ nét pixel khi phóng to thu nhỏ
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH }, // co giãn vừa màn hình, căn giữa
-  physics: { default: 'arcade', arcade: { gravity: { y: 1400 }, debug: false } }, // vật lý arcade có trọng lực
+  physics: { default: 'arcade', arcade: { gravity: { y: GRAVITY }, debug: false } }, // vật lý arcade có trọng lực
   scene: [MenuScene, GameScene, WinScene], // menu, cảnh chơi, màn chiến thắng
-});
+}); });

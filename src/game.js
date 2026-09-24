@@ -824,7 +824,8 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       this.bossFan(0xff66cc, speed, 2); // 5 tia hồng, mỗi viên 2 sát thương
       this.time.delayedCall(800, () => this.bossWaitClear()); // đợi hết đạn rồi đánh tiếp
     };
-    if (b.step % 2 === 1) { this.dcodedDash(1, () => this.bossTelegraph(b.fast ? 250 : 350, fanThenRest, 0xff88dd)); return; } // lượt lẻ: lao rồi bắn 5 tia ngay (chớp rất ngắn)
+    const dashReady = this.time.now - (b.lastDashAt || -1e9) >= 12000; // cú lao hồi 12 giây (skill lao của người chơi hồi 10 giây nên luôn kịp né)
+    if (b.step % 2 === 1 && dashReady) { b.lastDashAt = this.time.now; this.dcodedDash(1, () => this.bossTelegraph(b.fast ? 250 : 350, fanThenRest, 0xff88dd)); return; } // lượt lẻ: lao rồi bắn 5 tia ngay (chớp rất ngắn)
     this.bossTelegraph(b.fast ? 400 : 600, fanThenRest, 0xff88dd); // lượt chẵn: chớp hồng rồi bắn 5 tia
   }
 

@@ -15,7 +15,7 @@ const ARENA_X = 7600; // mép trái phòng boss
 const ROLES = { verified: { maxHp: 7 }, dliever: { maxHp: 10 }, dcoded: { maxHp: 15 } }; // máu tối đa theo role
 const LEVELS = { // dữ liệu từng màn
   1: { // màn 1 - xanh
-    neon: 0x3399ff, bgTint: 0x6699ff, color: 0x3399ff, music: 'music_stage', startRole: 'verified', boss: 'dliever', bossHp: 30, // màu, nhạc, role đầu màn, boss
+    neon: 0x3399ff, bgTint: 0x6699ff, color: 0x3399ff, bgFloor: 778, music: 'music_stage', startRole: 'verified', boss: 'dliever', bossHp: 30, // màu, nhạc, role đầu màn, boss
     ground: [[0, 900], [1000, 1900], [2020, 2700], [2800, 3700], [3820, 4600], [4740, 5500], [5620, 6500], [6620, LEVEL_W]], // các đoạn sàn, khe giữa là hố
     platforms: [[560, 380, 160], [1180, 370, 140], [1380, 300, 140], [2180, 370, 180], [2950, 370, 160], [3400, 360, 140], [3650, 300, 160], [4100, 370, 180], [4900, 360, 140], [5100, 290, 140], [5900, 370, 180], [6900, 360, 160], [7200, 300, 140]], // bục nổi
     walls: [[1640, 80], [4350, 80], [6200, 100]], // tường (x, cao)
@@ -25,7 +25,7 @@ const LEVELS = { // dữ liệu từng màn
     enemies: [['bot_1_1', 'WALKER', 520], ['bot_1_2', 'FLYER', 1100], ['bot_1_1', 'WALKER', 1300], ['bot_1_3', 'CHARGER', 1850], ['bot_1_2', 'FLYER', 2300], ['bot_1_1', 'WALKER', 2550], ['bot_1_1', 'SHOOTER', 3030, 370], ['bot_1_3', 'CHARGER', 3300], ['bot_1_1', 'WALKER', 3900], ['bot_1_2', 'FLYER', 4200], ['bot_1_1', 'WALKER', 4900], ['bot_1_1', 'SHOOTER', 5170, 290], ['bot_1_3', 'CHARGER', 5400], ['bot_1_2', 'FLYER', 5800], ['bot_1_1', 'WALKER', 6000], ['bot_1_1', 'WALKER', 6800], ['bot_1_2', 'FLYER', 7000], ['bot_1_3', 'CHARGER', 7400]], // quái (tên, kiểu, x, mặt đứng)
   },
   2: { // màn 2 - vàng
-    neon: 0xffcc33, bgTint: 0xffcc77, color: 0xffcc33, music: 'music_level2', startRole: 'dliever', boss: 'dcoded', bossHp: 42, // màu, nhạc, role đầu màn, boss
+    neon: 0xffcc33, bgTint: 0xffcc77, color: 0xffcc33, bgFloor: 798, music: 'music_level2', startRole: 'dliever', boss: 'dcoded', bossHp: 42, // màu, nhạc, role đầu màn, boss
     ground: [[0, 1000], [1120, 2000], [2150, 2900], [3050, 3800], [3950, 4700], [4850, 5600], [5750, 6500], [6650, LEVEL_W]], // các đoạn sàn
     platforms: [[500, 370, 160], [800, 300, 140], [1400, 360, 160], [1700, 290, 140], [2400, 370, 180], [3200, 360, 160], [3500, 290, 140], [4200, 370, 160], [4950, 360, 160], [5300, 290, 140], [6000, 370, 180], [6900, 360, 160], [7250, 300, 140]], // bục nổi
     walls: [[1900, 90], [4500, 90], [6300, 110]], // tường
@@ -35,7 +35,7 @@ const LEVELS = { // dữ liệu từng màn
     enemies: [['bot_2_1', 'WALKER', 600], ['bot_2_3', 'FLYER', 1000], ['bot_2_1', 'WALKER', 1500], ['bot_2_1', 'WALKER', 1560], ['bot_2_2', 'SHOOTER', 1760, 290], ['bot_2_3', 'FLYER', 2500], ['bot_2_1', 'WALKER', 3300], ['bot_2_1', 'WALKER', 3350], ['bot_2_2', 'SHOOTER', 3570, 290], ['bot_2_3', 'FLYER', 4000], ['bot_2_1', 'WALKER', 4300], ['bot_2_2', 'SHOOTER', 5030, 360], ['bot_2_1', 'WALKER', 5100], ['bot_2_3', 'FLYER', 5700], ['bot_2_1', 'WALKER', 6100], ['bot_2_1', 'WALKER', 6150], ['bot_2_1', 'WALKER', 6900], ['bot_2_3', 'FLYER', 7000], ['bot_2_2', 'SHOOTER', 7320, 300]], // quái màn 2
   },
   3: { // màn 3 - hồng, trùm cuối
-    neon: 0xff44cc, bgTint: 0xcc66ff, color: 0xff44cc, music: 'music_level3', startRole: 'dcoded', boss: 'dco', bossHp: 60, // màu, nhạc, role đầu màn, boss
+    neon: 0xff44cc, bgTint: 0xcc66ff, color: 0xff44cc, bgFloor: 796, music: 'music_level3', startRole: 'dcoded', boss: 'dco', bossHp: 60, // màu, nhạc, role đầu màn, boss
     ground: [[0, 800], [930, 1800], [1950, 2600], [2760, 3600], [3760, 4500], [4660, 5400], [5560, 6400], [6560, LEVEL_W]], // các đoạn sàn
     platforms: [[450, 360, 150], [700, 290, 140], [1300, 360, 160], [1550, 290, 140], [2200, 360, 160], [3000, 370, 180], [3300, 300, 140], [4000, 360, 160], [4250, 290, 140], [4900, 370, 160], [5800, 360, 160], [6050, 290, 140], [6900, 360, 160], [7250, 300, 140]], // bục nổi
     walls: [[1700, 100], [3500, 90], [5200, 110], [6300, 100]], // tường
@@ -89,7 +89,8 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.makeAnims(); // tạo các animation
     this.makePixelTexture(); // tạo hạt pixel cho hiệu ứng nổ
     this.bg = this.add.tileSprite(0, 0, GAME_W, GAME_H, `stage_bg_${this.level}`).setOrigin(0).setScrollFactor(0); // nền lặp ngang, đứng yên theo camera
-    this.bg.tileScaleX = this.bg.tileScaleY = GAME_H / this.textures.get(`stage_bg_${this.level}`).getSourceImage().height; // co ảnh nền vừa chiều cao màn hình
+    this.bg.tileScaleX = this.bg.tileScaleY = GROUND_Y / this.lv.bgFloor; // phóng ảnh sao cho mép sàn vẽ trong ảnh trùng mặt sàn thật (y=480)
+    this.add.rectangle(0, GROUND_Y, LEVEL_W, GAME_H - GROUND_Y + 200, 0x05050c).setOrigin(0); // dải tối dưới mặt sàn: che sàn vẽ trong ảnh để hố nhìn rõ là hố // co ảnh nền vừa chiều cao màn hình
     this.physics.world.setBounds(0, 0, LEVEL_W, GAME_H + 200); // biên thế giới, chừa khoảng dưới cho hố rơi
     this.physics.world.checkCollision.down = false; // cho phép rơi ra khỏi đáy (hố)
     this.solids = this.physics.add.staticGroup(); // nhóm khối đặc (sàn, bục, tường)

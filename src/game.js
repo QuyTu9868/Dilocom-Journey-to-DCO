@@ -44,6 +44,7 @@ const V2_SPEC = { idle: [4, 5.5], run: [8, 12.5], jump: [6, 0], shoot: [3, 9], h
 const V2 = { verified: { ...V2_SPEC, runshoot: [8, 12.5] }, dliever: { ...V2_SPEC, runshoot: [8, 12.5] }, dcoded: { ...V2_SPEC, runshoot: [8, 12.5] } }; // các role đã có bộ vẽ mới (kèm khung vừa chạy vừa bắn)
 const V2_MAP = { jump_up: 'jump_2', jump_down: 'jump_5', death_1: 'death_2', death_2: 'death_4' }; // đổi tên khung cũ sang khung mới (dùng cho boss)
 function frameKey(role, name) { return `${role}_${V2[role] && V2_MAP[name] ? V2_MAP[name] : name}`; } // tên khung đúng theo bộ vẽ của role
+const MINION_SIZE = { bot_1_1: [0.339, 48, 49], bot_1_2: [0.307, 45, 49], bot_1_3: [0.256, 44, 49], bot_2_1: [0.216, 30, 49], bot_2_2: [0.246, 39, 49], bot_2_3: [0.359, 72, 49], bot_3_1: [0.351, 60, 74], bot_3_2: [0.237, 36, 49], bot_3_3: [0.311, 56, 49] }; // [tỉ lệ vẽ để cao bằng người chơi (xe tăng 1.5 lần), rộng hitbox, cao hitbox]
 const CHAR_KEYS = ['verified', 'dliever', 'dcoded', 'dco']; // các nhân vật cần nạp
 const BOT_KEYS = ['bot_1_1', 'bot_1_2', 'bot_1_3', 'bot_2_1', 'bot_2_2', 'bot_2_3', 'bot_3_1', 'bot_3_2', 'bot_3_3']; // 9 quái của 3 màn
 
@@ -250,11 +251,12 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   addEnemy(key, type, x, groundY = GROUND_Y) { // tạo 1 quái
     const flying = type === 'FLYER'; // có phải quái bay không
     const big = key === 'bot_3_1'; // xe tăng Botnet Node phóng to 1.5 lần
-    const box = this.add.rectangle(x, flying ? 250 : groundY - 40, big ? 60 : 40, flying ? 40 : (big ? 75 : 50)); // hitbox quái
+    const [scale, bw, bh] = MINION_SIZE[key]; // cỡ vẽ và cỡ hitbox của con này
+    const box = this.add.rectangle(x, flying ? 250 : groundY - bh / 2 - 2, bw, bh); // hitbox khớp hình, nhỏ hơn hình một chút
     this.physics.add.existing(box); // gắn body vật lý
     this.enemyBoxes.add(box); // đưa vào nhóm quái
     box.body.setAllowGravity(!flying); // quái bay thì không trọng lực
-    const spr = this.add.sprite(x, box.y, `${key}_move_1`).setOrigin(0.5, 1).setScale(big ? 0.375 : 0.25).setDepth(9); // hình vẽ quái
+    const spr = this.add.sprite(x, box.y, `${key}_move_1`).setOrigin(0.5, 1).setScale(scale).setDepth(9); // hình vẽ quái, cao bằng người chơi
     spr.play(`${key}_move`); // chạy animation di chuyển
     const e = { key, type, box, spr, hp: big ? 7 : 3, state: 'alive', mode: 'idle', nextAt: this.time.now + 1500, baseY: box.y, color: this.lv.color }; // dữ liệu quái
     box.enemy = e; // gắn ngược dữ liệu vào hitbox

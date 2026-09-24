@@ -959,7 +959,7 @@ class MenuScene extends Phaser.Scene { // màn tiêu đề: chọn điều khi�
     this.registry.set('scheme', scheme); // dùng chung cho các cảnh
     const unlocked = Phaser.Math.Clamp(loadNum('unlocked', 1), 1, 3); // số màn đã mở khóa
     this.add.text(GAME_W / 2, 60, 'Dlicom: Journey to DCO', { fontFamily: 'monospace', fontSize: 42, color: '#88ccff', stroke: '#000', strokeThickness: 6 }).setOrigin(0.5); // tên game
-    this.add.text(GAME_W / 2, 105, tr('Từ Verified tay trắng, chiếm từng role tới DCO', 'Start as a nobody, steal every role up to DCO'), { fontFamily: 'monospace', fontSize: 16, color: '#aaaacc' }).setOrigin(0.5); // mô tả ngắn
+    this.add.text(GAME_W / 2, 105, tr('Từ Verified tay trắng, leo từng role lên tới DCO', 'Start as Verified, climb every role up to DCO'), { fontFamily: 'monospace', fontSize: 16, color: '#aaaacc' }).setOrigin(0.5); // mô tả ngắn
     this.add.text(GAME_W / 2, 150, tr('Điều khiển (phím C để đổi)', 'Controls (press C to switch)'), { fontFamily: 'monospace', fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // tiêu đề chọn điều khiển
     const style = { fontFamily: 'monospace', fontSize: 16, color: '#ffffff', align: 'center', backgroundColor: '#12122a', padding: { x: 14, y: 10 } }; // kiểu nút
     const schemeBtns = [['arrows', tr('Mũi tên\n← → đi  ↑ nhảy\nA bắn  S D skill', 'Arrow keys\n← → move  ↑ jump\nA shoot  S D skill')], ['wasd', tr('Kiểu FPS\nA D đi  W nhảy\nJ bắn  K L skill', 'FPS style\nA D move  W jump\nJ shoot  K L skill')]].map(([sc, label], i) => { // 2 nút điều khiển
@@ -1007,7 +1007,7 @@ class WinScene extends Phaser.Scene { // màn chiến thắng cuối game
   create() { // dựng màn thắng
     this.cameras.main.fadeIn(800, 255, 255, 255); // hiện dần từ trắng
     if (this.registry.get('musicOn')) this.sound.play('music_win', { volume: 0.5 }); // nhạc thắng
-    this.add.text(GAME_W / 2, 70, tr('BẠN ĐÃ CHIẾM ROLE DCO!', 'YOU TOOK THE DCO ROLE!'), { fontFamily: 'monospace', fontSize: 38, color: '#ff66cc', stroke: '#000', strokeThickness: 6 }).setOrigin(0.5); // chữ chiến thắng
+    this.add.text(GAME_W / 2, 70, tr('BẠN ĐÃ LÊN ROLE DCO!', 'YOU REACHED THE DCO ROLE!'), { fontFamily: 'monospace', fontSize: 38, color: '#ff66cc', stroke: '#000', strokeThickness: 6 }).setOrigin(0.5); // chữ chiến thắng
     this.add.text(GAME_W / 2, 115, 'Verified → Dliever → Dcoded → DCO', { fontFamily: 'monospace', fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // hành trình
     const spr = this.add.sprite(GAME_W / 2, 330, 'dco_idle_1').setOrigin(0.5, 1).setScale(0.9); // DCO đứng giữa màn
     spr.play('dco_idle'); // DCO thở

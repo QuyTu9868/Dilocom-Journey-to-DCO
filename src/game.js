@@ -511,7 +511,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   }
 
   playerShoot(time) { // bắn đạn thường
-    this.shootReadyAt = time + 320; // nhịp bắn 0.32 giây (khoảng 3 viên/giây)
+    this.shootReadyAt = time + 500; // nhịp bắn 0.5 giây (2 viên/giây)
     this.shootAnimUntil = time + (V2[this.role] ? 340 : 200); // giữ tư thế bắn (bộ mới đủ 3 khung: giơ tay, chớp lửa, thu tay)
     const v2 = V2[this.role], b0 = this.player.body; // bộ vẽ của role và body nhân vật
     if (!(v2 && v2.runshoot && b0.velocity.x !== 0 && b0.blocked.down)) this.pSprite.play(`${this.role}_shoot`); // đứng bắn thì chạy lại animation bắn, còn chạy bắn thì để chân bước tiếp

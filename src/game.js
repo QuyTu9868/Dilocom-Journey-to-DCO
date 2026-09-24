@@ -12,7 +12,7 @@ const FONT = '"Chakra Petch", monospace'; // phông chữ thường (có dấu t
 const FONT_TITLE = '"Bungee", "Chakra Petch", sans-serif'; // phông tiêu đề kiểu arcade
 const LEVEL_W = 8600; // chiều dài màn 1
 const ARENA_X = 7600; // mép trái phòng boss
-const ROLES = { verified: { maxHp: 5 }, dliever: { maxHp: 8 }, dcoded: { maxHp: 11 } }; // máu tối đa theo role
+const ROLES = { verified: { maxHp: 7 }, dliever: { maxHp: 10 }, dcoded: { maxHp: 15 } }; // máu tối đa theo role
 const LEVELS = { // dữ liệu từng màn
   1: { // màn 1 - xanh
     neon: 0x3399ff, bgTint: 0x6699ff, color: 0x3399ff, music: 'music_stage', startRole: 'verified', boss: 'dliever', bossHp: 30, // màu, nhạc, role đầu màn, boss
@@ -66,7 +66,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     for (const k of BOT_KEYS) for (const f of ENEMY_FRAMES) this.load.image(`${k}_${f}`, `assets/enemies/${k}/${k}_${f}.png`); // nạp từng khung quái
     for (const b of ['bullet_player', 'bullet_spam', 'bullet_boss']) this.load.image(b, `assets/bullets/${b}.png`); // nạp 3 loại đạn
     for (const i of ['item_health', 'item_spikes', 'item_checkpoint_off', 'item_checkpoint_on']) this.load.image(i, `assets/items/${i}.png`); // nạp vật phẩm
-    this.load.image('stage_bg', 'assets/background/stage_bg.png'); // nạp ảnh nền
+    for (let i = 1; i <= 3; i++) this.load.image(`stage_bg_${i}`, `assets/background/stage_bg_${i}.jpg`); // nạp ảnh nền riêng của 3 màn
     for (const n of ['shoot', 'fan', 'dash']) this.load.image(`icon_${n}`, `assets/ui/icon_${n}.png`); // nạp 3 icon nút bắn và skill
     for (const a of ['shoot', 'hit', 'jump', 'skill', 'enemy_fall', 'beep', 'explode_small', 'boss_down', 'explode_big', 'role_up', 'pickup', 'checkpoint', 'win', 'lose']) this.load.audio(a, `assets/audio/${a}.ogg`); // nạp 14 hiệu ứng âm thanh
     this.load.audio('music_stage', 'assets/audio/music_stage.mp3'); // nạp nhạc nền màn 1
@@ -88,9 +88,8 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.anims.resumeAll(); // chạy lại animation nếu lúc trước đang tạm dừng
     this.makeAnims(); // tạo các animation
     this.makePixelTexture(); // tạo hạt pixel cho hiệu ứng nổ
-    this.bg = this.add.tileSprite(0, 0, GAME_W, GAME_H, 'stage_bg').setOrigin(0).setScrollFactor(0); // nền lặp ngang, đứng yên theo camera
-    this.bg.tileScaleX = this.bg.tileScaleY = GAME_H / 941; // co ảnh nền vừa chiều cao màn hình
-    this.bg.setTint(this.lv.bgTint); // ám màu theo màn
+    this.bg = this.add.tileSprite(0, 0, GAME_W, GAME_H, `stage_bg_${this.level}`).setOrigin(0).setScrollFactor(0); // nền lặp ngang, đứng yên theo camera
+    this.bg.tileScaleX = this.bg.tileScaleY = GAME_H / this.textures.get(`stage_bg_${this.level}`).getSourceImage().height; // co ảnh nền vừa chiều cao màn hình
     this.physics.world.setBounds(0, 0, LEVEL_W, GAME_H + 200); // biên thế giới, chừa khoảng dưới cho hố rơi
     this.physics.world.checkCollision.down = false; // cho phép rơi ra khỏi đáy (hố)
     this.solids = this.physics.add.staticGroup(); // nhóm khối đặc (sàn, bục, tường)

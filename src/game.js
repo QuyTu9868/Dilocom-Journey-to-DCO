@@ -8,7 +8,7 @@ const ARENA_X = 7600; // mép trái phòng boss
 const ROLES = { verified: { maxHp: 5 }, dliever: { maxHp: 8 }, dcoded: { maxHp: 11 } }; // máu tối đa theo role
 const LEVELS = { // dữ liệu từng màn
   1: { // màn 1 - xanh
-    neon: 0x3399ff, bgTint: 0x6699ff, color: 0x3399ff, music: 'music_stage', startRole: 'verified', boss: 'dliever', bossHp: 40, // màu, nhạc, role đầu màn, boss
+    neon: 0x3399ff, bgTint: 0x6699ff, color: 0x3399ff, music: 'music_stage', startRole: 'verified', boss: 'dliever', bossHp: 30, // màu, nhạc, role đầu màn, boss
     ground: [[0, 900], [1000, 1900], [2020, 2700], [2800, 3700], [3820, 4600], [4740, 5500], [5620, 6500], [6620, LEVEL_W]], // các đoạn sàn, khe giữa là hố
     platforms: [[560, 380, 160], [1180, 370, 140], [1380, 300, 140], [2180, 370, 180], [2950, 370, 160], [3400, 360, 140], [3650, 300, 160], [4100, 370, 180], [4900, 360, 140], [5100, 290, 140], [5900, 370, 180], [6900, 360, 160], [7200, 300, 140]], // bục nổi
     walls: [[1640, 80], [4350, 80], [6200, 100]], // tường (x, cao)
@@ -18,7 +18,7 @@ const LEVELS = { // dữ liệu từng màn
     enemies: [['bot_1_1', 'WALKER', 520], ['bot_1_2', 'FLYER', 1100], ['bot_1_1', 'WALKER', 1300], ['bot_1_3', 'CHARGER', 1850], ['bot_1_2', 'FLYER', 2300], ['bot_1_1', 'WALKER', 2550], ['bot_1_1', 'SHOOTER', 3030, 370], ['bot_1_3', 'CHARGER', 3300], ['bot_1_1', 'WALKER', 3900], ['bot_1_2', 'FLYER', 4200], ['bot_1_1', 'WALKER', 4900], ['bot_1_1', 'SHOOTER', 5170, 290], ['bot_1_3', 'CHARGER', 5400], ['bot_1_2', 'FLYER', 5800], ['bot_1_1', 'WALKER', 6000], ['bot_1_1', 'WALKER', 6800], ['bot_1_2', 'FLYER', 7000], ['bot_1_3', 'CHARGER', 7400]], // quái (tên, kiểu, x, mặt đứng)
   },
   2: { // màn 2 - vàng
-    neon: 0xffcc33, bgTint: 0xffcc77, color: 0xffcc33, music: 'music_level2', startRole: 'dliever', boss: 'dcoded', bossHp: 55, // màu, nhạc, role đầu màn, boss
+    neon: 0xffcc33, bgTint: 0xffcc77, color: 0xffcc33, music: 'music_level2', startRole: 'dliever', boss: 'dcoded', bossHp: 42, // màu, nhạc, role đầu màn, boss
     ground: [[0, 1000], [1120, 2000], [2150, 2900], [3050, 3800], [3950, 4700], [4850, 5600], [5750, 6500], [6650, LEVEL_W]], // các đoạn sàn
     platforms: [[500, 370, 160], [800, 300, 140], [1400, 360, 160], [1700, 290, 140], [2400, 370, 180], [3200, 360, 160], [3500, 290, 140], [4200, 370, 160], [4950, 360, 160], [5300, 290, 140], [6000, 370, 180], [6900, 360, 160], [7250, 300, 140]], // bục nổi
     walls: [[1900, 90], [4500, 90], [6300, 110]], // tường
@@ -28,7 +28,7 @@ const LEVELS = { // dữ liệu từng màn
     enemies: [['bot_2_1', 'WALKER', 600], ['bot_2_3', 'FLYER', 1000], ['bot_2_1', 'WALKER', 1500], ['bot_2_1', 'WALKER', 1560], ['bot_2_2', 'SHOOTER', 1760, 290], ['bot_2_3', 'FLYER', 2500], ['bot_2_1', 'WALKER', 3300], ['bot_2_1', 'WALKER', 3350], ['bot_2_2', 'SHOOTER', 3570, 290], ['bot_2_3', 'FLYER', 4000], ['bot_2_1', 'WALKER', 4300], ['bot_2_2', 'SHOOTER', 5030, 360], ['bot_2_1', 'WALKER', 5100], ['bot_2_3', 'FLYER', 5700], ['bot_2_1', 'WALKER', 6100], ['bot_2_1', 'WALKER', 6150], ['bot_2_1', 'WALKER', 6900], ['bot_2_3', 'FLYER', 7000], ['bot_2_2', 'SHOOTER', 7320, 300]], // quái màn 2
   },
   3: { // màn 3 - hồng, trùm cuối
-    neon: 0xff44cc, bgTint: 0xcc66ff, color: 0xff44cc, music: 'music_level3', startRole: 'dcoded', boss: 'dco', bossHp: 80, // màu, nhạc, role đầu màn, boss
+    neon: 0xff44cc, bgTint: 0xcc66ff, color: 0xff44cc, music: 'music_level3', startRole: 'dcoded', boss: 'dco', bossHp: 60, // màu, nhạc, role đầu màn, boss
     ground: [[0, 800], [930, 1800], [1950, 2600], [2760, 3600], [3760, 4500], [4660, 5400], [5560, 6400], [6560, LEVEL_W]], // các đoạn sàn
     platforms: [[450, 360, 150], [700, 290, 140], [1300, 360, 160], [1550, 290, 140], [2200, 360, 160], [3000, 370, 180], [3300, 300, 140], [4000, 360, 160], [4250, 290, 140], [4900, 370, 160], [5800, 360, 160], [6050, 290, 140], [6900, 360, 160], [7250, 300, 140]], // bục nổi
     walls: [[1700, 100], [3500, 90], [5200, 110], [6300, 100]], // tường
@@ -190,6 +190,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     for (const [x, y, w] of lv.platforms) this.addBlock(x, y, w, 20); // bục nổi
     for (const [x, h] of lv.walls) this.addBlock(x, GROUND_Y - h, 40, h); // tường phải nhảy qua
     this.addBlock(ARENA_X - 20, 0, 20, 160); // mép trên cửa phòng boss (trang trí)
+    this.addBlock(ARENA_X + GAME_W - 20, 0, 40, GROUND_Y); // tường mép phải phòng boss, không lao hay đi ra khỏi màn
     for (const x of lv.spikes) this.addSpikes(x); // gai
     for (const [x, y] of lv.health) this.addHealth(x, y); // cục máu đặt sẵn
     this.cps = this.physics.add.staticGroup(); // nhóm cột hồi sinh
@@ -762,7 +763,8 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     b.spr.y = b.box.body.bottom; // chân hình ở đáy hitbox
     if (b.state !== 'alive') return; // chết rồi thì thôi
     if (!b.dashing) b.spr.setFlipX(this.player.x < b.box.x); // quay mặt về người chơi (lúc lao thì giữ hướng)
-    if (b.box.body.blocked.down && b.jumping) { b.jumping = false; b.box.body.setVelocityX(0); } // đáp đất sau cú nhảy
+    if (b.box.body.blocked.down && b.jumping && this.time.now > b.jumpAt + 200) { b.jumping = false; b.box.body.setVelocityX(0); } // đáp đất sau cú nhảy (bỏ qua lúc vừa bật khỏi đất)
+    if (!b.acting && !b.dashing && !b.jumping && b.box.body.blocked.down) this.bossWalk(b); // giữa các đòn thì đi bộ
     this.bossBar.width = 500 * b.hp / b.maxHp; // cập nhật thanh máu boss
   }
 
@@ -777,6 +779,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       const left = ARENA_X + 120, right = ARENA_X + GAME_W - 120; // 2 vị trí đứng trong phòng
       const target = b.box.x < ARENA_X + GAME_W / 2 ? right : left; // nhảy sang phía đối diện
       b.jumping = true; // đánh dấu đang nhảy
+      b.jumpAt = this.time.now; // mốc bật nhảy
       b.spr.anims.stop(); // dừng animation
       b.spr.setTexture(frameKey(b.key, 'jump_up')); // khung nhảy
       b.box.body.setVelocity((target - b.box.x) / 1.0, -600); // bay khoảng 1 giây tới đích
@@ -873,10 +876,25 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.time.delayedCall(400, () => this.bossNext()); // hết đạn thì nghỉ chút rồi đánh tiếp
   }
 
+  bossWalk(b) { // boss đi bộ giữa các đòn, mỗi con một kiểu
+    const dx = this.player.x - b.box.x, dist = Math.abs(dx), dir = Math.sign(dx) || 1; // khoảng cách và hướng tới người chơi
+    let v = 0; // tốc độ đi
+    if (b.key === 'dliever') v = dist < 300 ? -dir * 90 : dist > 520 ? dir * 70 : 0; // Dliever bắn xa: giữ khoảng cách 300-520
+    else if (dist > 110) v = dir * (b.key === 'dco' ? (b.fast ? 130 : 80) : 90); // Dcoded, DCO: áp sát người chơi, DCO nổi điên đi nhanh hơn
+    const nx = b.box.x + v * 0.15; // vị trí sắp tới
+    if (nx < ARENA_X + 70 || nx > ARENA_X + GAME_W - 70) v = 0; // không ra khỏi phòng boss
+    b.box.body.setVelocityX(v); // đi
+    if (v !== 0) this.playAnim(b.spr, `${b.key}_run`); // đang đi thì chạy animation bước
+    else this.playAnim(b.spr, `${b.key}_idle`); // đứng thì thở
+  }
+
   bossTelegraph(ms, then, color = 0x88ddff) { // boss chớp màu báo trước đòn
     const b = this.boss; // boss
+    b.acting = true; // đang ra đòn: đứng yên, không đi bộ
+    b.box.body.setVelocityX(0); // dừng lại để báo trước
+    this.playAnim(b.spr, `${b.key}_idle`); // thôi bước, đứng lại
     this.time.addEvent({ delay: 100, repeat: Math.floor(ms / 100) - 1, callback: () => { if (b.state !== 'alive') return; if (b.spr.isTinted) b.spr.clearTint(); else b.spr.setTintFill(color); } }); // bật tắt chớp màu
-    this.time.delayedCall(ms, () => { if (b.state !== 'alive') return; b.spr.clearTint(); then(); }); // hết báo trước thì ra đòn
+    this.time.delayedCall(ms, () => { if (b.state !== 'alive') return; b.spr.clearTint(); then(); this.time.delayedCall(350, () => { b.acting = false; }); }); // hết báo trước thì ra đòn, xong đòn mới được đi tiếp
   }
 
   bossFan(tint, speed, dmg) { // bắn 5 tia hình quạt về phía người chơi

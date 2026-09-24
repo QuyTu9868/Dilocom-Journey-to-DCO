@@ -59,6 +59,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     for (const b of ['bullet_player', 'bullet_spam', 'bullet_boss']) this.load.image(b, `assets/bullets/${b}.png`); // nạp 3 loại đạn
     for (const i of ['item_health', 'item_spikes', 'item_checkpoint_off', 'item_checkpoint_on']) this.load.image(i, `assets/items/${i}.png`); // nạp vật phẩm
     this.load.image('stage_bg', 'assets/background/stage_bg.png'); // nạp ảnh nền
+    for (const n of ['shoot', 'fan', 'dash']) this.load.image(`icon_${n}`, `assets/ui/icon_${n}.png`); // nạp 3 icon nút bắn và skill
     for (const a of ['shoot', 'hit', 'jump', 'skill', 'enemy_fall', 'beep', 'explode_small', 'boss_down', 'explode_big', 'role_up', 'pickup', 'checkpoint', 'win', 'lose']) this.load.audio(a, `assets/audio/${a}.ogg`); // nạp 14 hiệu ứng âm thanh
     this.load.audio('music_stage', 'assets/audio/music_stage.mp3'); // nạp nhạc nền màn 1
     this.load.audio('music_level2', 'assets/audio/music_level2.mp3'); // nạp nhạc nền màn 2
@@ -441,16 +442,16 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.add.rectangle(16, 32, 204, 16, 0x000000).setOrigin(0).setStrokeStyle(2, 0xffffff).setScrollFactor(0).setDepth(d); // khung thanh máu
     this.hpFill = this.add.rectangle(18, 34, 200, 12, 0x44ff66).setOrigin(0).setScrollFactor(0).setDepth(d); // thanh máu
     this.hpNum = this.add.text(228, 30, '', { fontFamily: 'monospace', fontSize: 16, color: '#ffffff', stroke: '#000', strokeThickness: 3 }).setScrollFactor(0).setDepth(d); // số máu
-    const wasd = this.scheme === 'wasd'; // kiểu điều khiển
-    this.skillIcons = [[tr('5 TIA', '5-SHOT'), wasd ? 'K' : 'S', 5000], [tr('LAO', 'DASH'), wasd ? 'L' : 'D', 10000]].map(([name, key, total], i) => { // 2 icon skill
-      const x = 16 + i * 60, y = 58; // vị trí icon
-      const box = this.add.rectangle(x, y, 52, 52, 0x12122a).setOrigin(0).setStrokeStyle(2, this.lv.neon).setScrollFactor(0).setDepth(d); // ô icon
-      const label = this.add.text(x + 26, y + 18, name, { fontFamily: 'monospace', fontSize: 13, color: '#ffffff' }).setOrigin(0.5).setScrollFactor(0).setDepth(d); // tên skill
-      const keyTxt = this.add.text(x + 26, y + 38, `[${key}]`, { fontFamily: 'monospace', fontSize: 12, color: '#aaaacc' }).setOrigin(0.5).setScrollFactor(0).setDepth(d); // phím bấm
-      const cover = this.add.rectangle(x + 1, y + 51, 50, 50, 0x000000, 0.7).setOrigin(0, 1).setScale(1, 0).setScrollFactor(0).setDepth(d + 1); // lớp phủ hồi chiêu
-      const cd = this.add.text(x + 26, y + 26, '', { fontFamily: 'monospace', fontSize: 20, color: '#ffffff', stroke: '#000', strokeThickness: 3 }).setOrigin(0.5).setScrollFactor(0).setDepth(d + 2); // số giây hồi
-      return { parts: [box, label, keyTxt], cover, cd, total }; // dữ liệu icon
-    });
+    this.cdUi = []; // danh sách nút có hiển thị hồi chiêu
+    if (!this.sys.game.device.input.touch) { // máy tính: 2 icon skill dưới thanh máu
+      const wasd = this.scheme === 'wasd'; // kiểu điều khiển
+      [['fan', wasd ? 'K' : 'S', 1], ['dash', wasd ? 'L' : 'D', 2]].forEach(([icon, key, n], i) => { // skill 1 và 2
+        const x = 44 + i * 64, y = 84, r = 26; // tâm và bán kính icon
+        const img = this.add.image(x, y, `icon_${icon}`).setDisplaySize(r * 2, r * 2).setScrollFactor(0).setDepth(d); // hình icon
+        const keyTxt = this.add.text(x, y + r + 9, `[${key}]`, { fontFamily: 'monospace', fontSize: 12, color: '#ccccee', stroke: '#000', strokeThickness: 3 }).setOrigin(0.5).setScrollFactor(0).setDepth(d); // phím bấm dưới icon
+        this.addCdUi(x, y, r, [img, keyTxt], n); // gắn vòng hồi chiêu
+      });
+    }
     this.add.rectangle(GAME_W / 2 - 150, 10, 300, 4, 0xffffff, 0.25).setOrigin(0, 0.5).setScrollFactor(0).setDepth(d); // vạch tiến độ màn
     this.progDot = this.add.circle(GAME_W / 2 - 150, 10, 6, this.lv.neon).setScrollFactor(0).setDepth(d); // chấm vị trí người chơi
   }
@@ -461,35 +462,52 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.hpFill.width = 200 * ratio; // độ dài thanh máu
     this.hpFill.fillColor = ratio > 0.5 ? 0x44ff66 : ratio > 0.25 ? 0xffcc33 : 0xff4444; // đổi màu khi yếu máu
     this.hpNum.setText(`${Math.max(0, this.hp)}/${this.maxHp}`); // số máu
-    const has = [this.hasSkill1, this.hasSkill2], ready = [this.skill1ReadyAt, this.skill2ReadyAt]; // skill đã mở và mốc hồi
-    this.skillIcons.forEach((ic, i) => { // từng icon
-      for (const p of ic.parts) p.setAlpha(has[i] ? 1 : 0.25); // chưa mở thì mờ
-      const left = has[i] ? Math.max(0, ready[i] - time) : 0; // thời gian hồi còn lại
-      ic.cover.setScale(1, Math.min(1, left / ic.total)); // lớp phủ tụt dần khi hồi
-      ic.parts[1].setVisible(left === 0); // đang hồi thì ẩn tên skill cho khỏi đè số giây
-      ic.cd.setText(left > 0 ? String(Math.ceil(left / 1000)) : ''); // số giây còn lại
-    });
+    for (const c of this.cdUi) this.drawCd(c, time); // vẽ vòng hồi chiêu của mọi nút
     this.progDot.x = GAME_W / 2 - 150 + 300 * Phaser.Math.Clamp(this.player.x / ARENA_X, 0, 1); // vị trí trên vạch tiến độ
+  }
+
+  addCdUi(x, y, r, parts, n) { // tạo lớp phủ hồi chiêu cho 1 nút (n: 0 bắn, 1 skill 5 tia, 2 skill lao)
+    const g = this.add.graphics().setScrollFactor(0).setDepth(170); // lớp phủ tối hình quạt
+    const txt = this.add.text(x, y, '', { fontFamily: 'monospace', fontSize: Math.round(r * 0.75), color: '#ffffff', stroke: '#000', strokeThickness: 4 }).setOrigin(0.5).setScrollFactor(0).setDepth(171); // số giây hồi
+    this.cdUi.push({ x, y, r, parts, n, g, txt }); // lưu lại để cập nhật mỗi khung
+  }
+
+  drawCd(c, time) { // vẽ hồi chiêu kiểu MOBA: quạt tối thu dần theo chiều kim đồng hồ + số giây
+    const info = [[true, this.shootReadyAt, 500], [this.hasSkill1, this.skill1ReadyAt, 5000], [this.hasSkill2, this.skill2ReadyAt, 10000]][c.n]; // [đã mở, mốc hồi xong, tổng thời gian hồi]
+    const [has, readyAt, total] = info; // tách dữ liệu
+    for (const p of c.parts) p.setAlpha(has ? 1 : 0.3); // chưa mở thì mờ
+    const left = has ? Math.max(0, readyAt - time) : 0; // thời gian hồi còn lại
+    c.g.clear(); // xoá hình cũ
+    if (left > 0) { // đang hồi chiêu
+      const start = -Math.PI / 2; // bắt đầu từ đỉnh (12 giờ)
+      c.g.fillStyle(0x000000, 0.65); // màu tối mờ
+      c.g.slice(c.x, c.y, c.r, start + Math.PI * 2 * (1 - left / total), start + Math.PI * 2, false); // phần còn phải chờ
+      c.g.fillPath(); // tô quạt
+    }
+    c.txt.setText(left > 0 && total >= 1000 ? (left < 1000 ? (left / 1000).toFixed(1) : String(Math.ceil(left / 1000))) : ''); // skill hiện số giây, nút bắn chỉ hiện quạt
   }
 
   createTouch() { // nút ảo cho điện thoại
     this.touch = {}; // trạng thái các nút ảo
     if (!this.sys.game.device.input.touch) return; // máy không cảm ứng thì bỏ qua
     this.input.addPointer(3); // cho phép chạm nhiều ngón cùng lúc
-    const mk = (x, y, label, name) => { // tạo 1 nút tròn
-      const c = this.add.circle(x, y, 40, 0xffffff, 0.15).setStrokeStyle(2, 0xffffff, 0.6).setScrollFactor(0).setDepth(160).setInteractive(); // hình nút
-      this.add.text(x, y, label, { fontFamily: 'monospace', fontSize: 20, color: '#ffffff' }).setOrigin(0.5).setScrollFactor(0).setDepth(161); // chữ trên nút
-      c.on('pointerdown', () => { this.touch[name] = true; this.touch[name + 'Tap'] = true; c.setFillStyle(0xffffff, 0.4); }); // chạm vào nút
-      const up = () => { this.touch[name] = false; c.setFillStyle(0xffffff, 0.15); }; // nhả nút
+    const mk = (x, y, r, name, label, icon, n) => { // tạo 1 nút tròn (có icon thì vẽ icon)
+      const c = this.add.circle(x, y, r, 0xffffff, icon ? 0.001 : 0.15).setStrokeStyle(icon ? 0 : 2, 0xffffff, 0.6).setScrollFactor(0).setDepth(160).setInteractive(); // vùng chạm
+      const face = icon ? this.add.image(x, y, `icon_${icon}`).setDisplaySize(r * 2, r * 2) : this.add.text(x, y, label, { fontFamily: 'monospace', fontSize: 26, color: '#ffffff' }).setOrigin(0.5); // icon hoặc chữ
+      face.setScrollFactor(0).setDepth(161); // cố định theo camera
+      const base = face.scale; // cỡ gốc để nhún khi bấm
+      c.on('pointerdown', () => { this.touch[name] = true; this.touch[name + 'Tap'] = true; face.setScale(base * 0.88); if (!icon) c.setFillStyle(0xffffff, 0.4); }); // chạm vào nút
+      const up = () => { this.touch[name] = false; face.setScale(base); if (!icon) c.setFillStyle(0xffffff, 0.15); }; // nhả nút
       c.on('pointerup', up); // nhấc ngón
       c.on('pointerout', up); // trượt ngón ra ngoài
+      if (n !== undefined) this.addCdUi(x, y, r, [face], n); // nút bắn và skill có vòng hồi chiêu
     };
-    mk(70, 470, '◀', 'left'); // nút đi trái
-    mk(170, 470, '▶', 'right'); // nút đi phải
-    mk(120, 375, '▲', 'jump'); // nút nhảy
-    mk(890, 470, tr('BẮN', 'FIRE'), 'shoot'); // nút bắn
-    mk(790, 470, tr('5T', '5X'), 'skill1'); // nút skill 5 tia
-    mk(890, 370, tr('LAO', 'DASH'), 'skill2'); // nút skill lao
+    mk(75, 460, 46, 'left', '◀'); // trái: đi trái
+    mk(190, 460, 46, 'right', '▶'); // trái: đi phải
+    mk(860, 440, 56, 'shoot', '', 'shoot', 0); // phải: nút bắn to
+    mk(735, 470, 46, 'jump', '▲'); // phải: nút nhảy cạnh nút bắn
+    mk(760, 345, 38, 'skill1', '', 'fan', 1); // phải: skill 5 tia
+    mk(880, 310, 38, 'skill2', '', 'dash', 2); // phải: skill lao
   }
 
   swapRunAnim(key) { // đổi qua lại giữa chạy và chạy bắn, giữ đúng bước chân đang chạy

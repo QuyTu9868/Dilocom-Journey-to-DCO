@@ -326,7 +326,10 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       if (this.keys.left.isDown || this.touch.left) { body.setVelocityX(-220); this.facing = -1; } // đi trái
       else if (this.keys.right.isDown || this.touch.right) { body.setVelocityX(220); this.facing = 1; } // đi phải
       else body.setVelocityX(0); // đứng yên
-      if (this.pressed('jump') && onGround) { body.setVelocityY(-620); this.sfx('jump', 0.3); this.jumpFx(); } // nhảy khi đang đứng đất
+      if (this.pressed('jump') && onGround) { body.setVelocityY(-620); this.jumpCut = true; this.sfx('jump', 0.3); this.jumpFx(); } // nhảy khi đang đứng đất (lực tối đa)
+      const jumpHeld = this.keys.jump.isDown || this.touch.jump; // còn giữ phím nhảy không
+      if (this.jumpCut && !jumpHeld && body.velocity.y < 0) { body.setVelocityY(body.velocity.y * 0.4); this.jumpCut = false; } // thả phím sớm khi đang bay lên thì hãm lại: bấm nhẹ nhảy thấp, giữ lâu nhảy cao
+      if (body.velocity.y >= 0) this.jumpCut = false; // đã qua đỉnh thì thôi xét
     }
     if ((this.keys.shoot.isDown || this.touch.shoot) && time > this.shootReadyAt) this.playerShoot(time); // giữ phím bắn để bắn liên tục có nhịp
     if (this.hasSkill1 && this.pressed('skill1') && time > this.skill1ReadyAt) this.playerFan(time); // dùng skill 5 tia khi đã hồi xong
@@ -508,7 +511,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   }
 
   playerShoot(time) { // bắn đạn thường
-    this.shootReadyAt = time + 220; // nhịp bắn 0.22 giây
+    this.shootReadyAt = time + 320; // nhịp bắn 0.32 giây (khoảng 3 viên/giây)
     this.shootAnimUntil = time + (V2[this.role] ? 340 : 200); // giữ tư thế bắn (bộ mới đủ 3 khung: giơ tay, chớp lửa, thu tay)
     const v2 = V2[this.role], b0 = this.player.body; // bộ vẽ của role và body nhân vật
     if (!(v2 && v2.runshoot && b0.velocity.x !== 0 && b0.blocked.down)) this.pSprite.play(`${this.role}_shoot`); // đứng bắn thì chạy lại animation bắn, còn chạy bắn thì để chân bước tiếp

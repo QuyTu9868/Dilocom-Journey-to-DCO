@@ -473,7 +473,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   }
 
   drawCd(c, time) { // vẽ hồi chiêu kiểu MOBA: quạt tối thu dần theo chiều kim đồng hồ + số giây
-    const info = [[true, this.shootReadyAt, 500], [this.hasSkill1, this.skill1ReadyAt, 5000], [this.hasSkill2, this.skill2ReadyAt, 10000]][c.n]; // [đã mở, mốc hồi xong, tổng thời gian hồi]
+    const info = [[true, this.shootReadyAt, 333], [this.hasSkill1, this.skill1ReadyAt, 5000], [this.hasSkill2, this.skill2ReadyAt, 10000]][c.n]; // [đã mở, mốc hồi xong, tổng thời gian hồi]
     const [has, readyAt, total] = info; // tách dữ liệu
     for (const p of c.parts) p.setAlpha(has ? 1 : 0.3); // chưa mở thì mờ
     const left = has ? Math.max(0, readyAt - time) : 0; // thời gian hồi còn lại
@@ -529,7 +529,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   }
 
   playerShoot(time) { // bắn đạn thường
-    this.shootReadyAt = time + 500; // nhịp bắn 0.5 giây (2 viên/giây)
+    this.shootReadyAt = time + 333; // nhịp bắn 0.33 giây (3 viên/giây)
     this.shootAnimUntil = time + (V2[this.role] ? 340 : 200); // giữ tư thế bắn (bộ mới đủ 3 khung: giơ tay, chớp lửa, thu tay)
     const v2 = V2[this.role], b0 = this.player.body; // bộ vẽ của role và body nhân vật
     if (!(v2 && v2.runshoot && b0.velocity.x !== 0 && b0.blocked.down)) this.pSprite.play(`${this.role}_shoot`); // đứng bắn thì chạy lại animation bắn, còn chạy bắn thì để chân bước tiếp

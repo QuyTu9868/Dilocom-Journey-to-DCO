@@ -739,7 +739,8 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.addBlock(ARENA_X - 20, 160, 20, GROUND_Y - 160); // đóng cửa phòng, không chạy ra được
     this.respawnX = ARENA_X + 80; // rơi hố thì về đầu phòng boss
     const huge = this.lv.boss === 'dco'; // DCO to nhất
-    const box = this.add.rectangle(ARENA_X + 760, GROUND_Y - 70, huge ? 76 : 60, huge ? 135 : 110); // hitbox boss
+    const [bw, bh] = { dliever: [73, 87], dcoded: [74, 88], dco: [99, 106] }[this.lv.boss]; // hitbox khớp hình boss, nhỏ hơn hình một chút
+    const box = this.add.rectangle(ARENA_X + 760, GROUND_Y - bh / 2 - 2, bw, bh); // hitbox boss
     this.physics.add.existing(box); // gắn body
     this.physics.add.collider(box, this.solids); // boss đứng trên sàn
     const key = this.lv.boss; // tên boss của màn

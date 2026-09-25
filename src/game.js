@@ -52,7 +52,8 @@ const V2 = { verified: { ...V2_SPEC, runshoot: [8, 12.5] }, dliever: { ...V2_SPE
 const FACES_LEFT = { dco: true }; // hình vẽ quay mặt sang trái (các nhân vật khác quay phải) // các role đã có bộ vẽ mới (kèm khung vừa chạy vừa bắn)
 const V2_MAP = { jump_up: 'jump_2', jump_down: 'jump_5', death_1: 'death_2', death_2: 'death_4' }; // đổi tên khung cũ sang khung mới (dùng cho boss)
 function frameKey(role, name) { return `${role}_${V2[role] && V2_MAP[name] ? V2_MAP[name] : name}`; } // tên khung đúng theo bộ vẽ của role
-const MINION_SIZE = { bot_1_1: [0.339, 48, 49], bot_1_2: [0.307, 45, 49], bot_1_3: [0.256, 44, 49], bot_2_1: [0.216, 30, 49], bot_2_2: [0.246, 39, 49], bot_2_3: [0.359, 72, 49], bot_3_1: [0.351, 60, 74], bot_3_2: [0.237, 36, 49], bot_3_3: [0.311, 56, 49] }; // [tỉ lệ vẽ để cao bằng người chơi (xe tăng 1.5 lần), rộng hitbox, cao hitbox]
+const CHARGER_V2 = ['bot_1_3', 'bot_3_3']; // 2 con lao tới có bộ vẽ mới: đi 4 khung, lao 2 khung, dừng 1 khung
+const MINION_SIZE = { bot_1_1: [0.339, 48, 49], bot_1_2: [0.307, 45, 49], bot_1_3: [0.359, 42, 49], bot_2_1: [0.216, 30, 49], bot_2_2: [0.246, 39, 49], bot_2_3: [0.359, 72, 49], bot_3_1: [0.351, 60, 74], bot_3_2: [0.237, 36, 49], bot_3_3: [0.394, 55, 49] }; // [tỉ lệ vẽ để cao bằng người chơi (xe tăng 1.5 lần), rộng hitbox, cao hitbox]
 const CHAR_KEYS = ['verified', 'dliever', 'dcoded', 'dco']; // các nhân vật cần nạp
 const BOT_KEYS = ['bot_1_1', 'bot_1_2', 'bot_1_3', 'bot_2_1', 'bot_2_2', 'bot_2_3', 'bot_3_1', 'bot_3_2', 'bot_3_3']; // 9 quái của 3 màn
 
@@ -65,6 +66,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       else for (const f of PLAYER_FRAMES) this.load.image(`${k}_${f}`, `assets/characters/${k}/${k}_${f}.png`); // bộ cũ: 13 khung cố định
     }
     for (const k of BOT_KEYS) for (const f of ENEMY_FRAMES) this.load.image(`${k}_${f}`, `assets/enemies/${k}/${k}_${f}.png`); // nạp từng khung quái
+    for (const k of CHARGER_V2) for (const f of ['move_3', 'move_4', 'charge_1', 'charge_2', 'recover_1']) this.load.image(`${k}_${f}`, `assets/enemies/${k}/${k}_${f}.png`); // nạp thêm khung của bộ vẽ mới
     for (const b of ['bullet_player', 'bullet_spam', 'bullet_boss']) this.load.image(b, `assets/bullets/${b}.png`); // nạp 3 loại đạn
     for (const i of ['item_health', 'item_spikes', 'item_checkpoint_off', 'item_checkpoint_on']) this.load.image(i, `assets/items/${i}.png`); // nạp vật phẩm
     for (let i = 1; i <= 3; i++) this.load.image(`stage_bg_${i}`, `assets/background/stage_bg_${i}.jpg`); // nạp ảnh nền riêng của 3 màn
@@ -169,7 +171,9 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     }
     for (const k of BOT_KEYS) { // lặp từng quái
       if (this.anims.exists(`${k}_move`)) continue; // đã tạo rồi thì bỏ qua
-      this.anims.create({ key: `${k}_move`, frames: [{ key: `${k}_move_1` }, { key: `${k}_move_2` }], frameRate: 8, repeat: -1 }); // quái di chuyển lặp 2 khung
+      const v2 = CHARGER_V2.includes(k); // con này có bộ vẽ mới không
+      this.anims.create({ key: `${k}_move`, frames: (v2 ? [1, 2, 3, 4] : [1, 2]).map(n => ({ key: `${k}_move_${n}` })), frameRate: v2 ? 9 : 8, repeat: -1 }); // quái di chuyển lặp (bộ mới 4 khung)
+      if (v2) this.anims.create({ key: `${k}_charge`, frames: [{ key: `${k}_charge_1` }, { key: `${k}_charge_2` }], frameRate: 12, repeat: -1 }); // khung đang lao
     }
   }
 
@@ -773,9 +777,9 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       body.setVelocityX(0); // đứng tại chỗ
       if (near && time > e.nextAt) { e.nextAt = time + 2200; this.warnFlash(e, 400, () => { this.enemyShoot(e, dir, 1); if (e.key === 'bot_2_2') this.enemyShoot(e, -dir, 0); }); } // nháy 0.4 giây rồi bắn nhắm người chơi
     } else if (e.type === 'CHARGER') { // quái lao
-      if (e.mode === 'idle') { body.setVelocityX(0); if (Math.abs(dx) < 360 && time > e.nextAt) { e.mode = 'warn'; e.chargeDir = dir; e.spr.anims.stop(); e.spr.setTexture(`${e.key}_attack_1`); this.tweens.add({ targets: e.spr, angle: 8, yoyo: true, repeat: 5, duration: 40, onComplete: () => e.spr.setAngle(0) }); this.time.delayedCall(500, () => { if (e.state === 'alive') { e.mode = 'charge'; e.modeUntil = this.time.now + 800; } }); } } // thấy người chơi thì khựng rung 0.5 giây
+      if (e.mode === 'idle') { body.setVelocityX(0); if (Math.abs(dx) < 360 && time > e.nextAt) { e.mode = 'warn'; e.chargeDir = dir; e.spr.anims.stop(); e.spr.setTexture(`${e.key}_attack_1`); this.tweens.add({ targets: e.spr, angle: 8, yoyo: true, repeat: 5, duration: 40, onComplete: () => e.spr.setAngle(0) }); this.time.delayedCall(500, () => { if (e.state === 'alive') { e.mode = 'charge'; e.modeUntil = this.time.now + 800; if (this.anims.exists(`${e.key}_charge`)) e.spr.play(`${e.key}_charge`); } }); } } // thấy người chơi thì khựng rung 0.5 giây
       else if (e.mode === 'warn') body.setVelocityX(0); // đứng yên lúc báo trước
-      else if (e.mode === 'charge') { body.setVelocityX(e.chargeDir * 420); if (time > e.modeUntil) { e.mode = 'idle'; e.nextAt = time + 1200; e.spr.play(`${e.key}_move`); } } // lao thẳng 0.8 giây rồi nghỉ
+      else if (e.mode === 'charge') { body.setVelocityX(e.chargeDir * 420); if (time > e.modeUntil) { e.mode = 'idle'; e.nextAt = time + 1200; if (CHARGER_V2.includes(e.key)) { e.spr.anims.stop(); e.spr.setTexture(`${e.key}_recover_1`); this.time.delayedCall(300, () => { if (e.state === 'alive' && e.mode === 'idle') e.spr.play(`${e.key}_move`); }); } else e.spr.play(`${e.key}_move`); } } // lao thẳng 0.8 giây, khựng dừng một nhịp rồi đi tiếp
     } else if (e.type === 'FLYER') { // quái bay
       if (e.mode === 'idle') { // đang lượn
         body.setVelocityX(near ? dir * (e.key === 'bot_3_2' ? 160 : 90) : 0); // bay về phía người chơi (Deepfake bay nhanh)

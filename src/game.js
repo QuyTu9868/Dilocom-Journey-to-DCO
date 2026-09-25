@@ -90,7 +90,6 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.makePixelTexture(); // tạo hạt pixel cho hiệu ứng nổ
     this.bg = this.add.tileSprite(0, 0, GAME_W, GAME_H, `stage_bg_${this.level}`).setOrigin(0).setScrollFactor(0); // nền lặp ngang, đứng yên theo camera
     this.bg.tileScaleX = this.bg.tileScaleY = GROUND_Y / this.lv.bgFloor; // phóng ảnh sao cho mép sàn vẽ trong ảnh trùng mặt sàn thật (y=480)
-    this.add.rectangle(0, GROUND_Y, LEVEL_W, GAME_H - GROUND_Y + 200, 0x05050c).setOrigin(0); // dải tối dưới mặt sàn: che sàn vẽ trong ảnh để hố nhìn rõ là hố // co ảnh nền vừa chiều cao màn hình
     this.physics.world.setBounds(0, 0, LEVEL_W, GAME_H + 200); // biên thế giới, chừa khoảng dưới cho hố rơi
     this.physics.world.checkCollision.down = false; // cho phép rơi ra khỏi đáy (hố)
     this.solids = this.physics.add.staticGroup(); // nhóm khối đặc (sàn, bục, tường)
@@ -180,6 +179,33 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     g.destroy(); // xoá bút vẽ
   }
 
+  addGrid(x0, x1) { // lưới điện trên sàn: dẫm vào mất máu và bị hất lên
+    const w = x1 - x0, color = this.lv.neon; // độ rộng và màu điện theo màn
+    const g = this.add.graphics().setDepth(4); // bút vẽ lưới
+    const zap = this.add.graphics().setDepth(5); // bút vẽ tia điện chạy ngang
+    g.fillStyle(0x05050c, 0.85).fillRect(x0, GROUND_Y - 6, w, 14); // nền tối của tấm lưới
+    g.lineStyle(2, color, 0.9); // nét lưới neon
+    for (let x = x0; x <= x1; x += 12) g.lineBetween(x, GROUND_Y - 6, x + 6, GROUND_Y + 8); // gạch chéo xuôi
+    for (let x = x0 + 6; x <= x1 + 6; x += 12) g.lineBetween(x, GROUND_Y - 6, x - 6, GROUND_Y + 8); // gạch chéo ngược
+    g.lineStyle(3, color, 1).strokeRect(x0, GROUND_Y - 6, w, 14); // viền tấm lưới
+    this.time.addEvent({ delay: 110, loop: true, callback: () => { // tia điện nhảy liên tục
+      zap.clear().lineStyle(2, 0xffffff, 0.9); // nét trắng sáng
+      let px = x0, py = GROUND_Y - 10; // điểm đầu tia
+      while (px < x1) { const nx = Math.min(x1, px + Phaser.Math.Between(10, 22)), ny = GROUND_Y - Phaser.Math.Between(4, 20); zap.lineBetween(px, py, nx, ny); px = nx; py = ny; } // tia zíc zắc ngẫu nhiên
+      zap.setAlpha(Math.random() < 0.3 ? 0 : 1); // thỉnh thoảng tắt để nhấp nháy
+    } });
+    const zone = this.add.zone(x0 + w / 2, GROUND_Y - 4, w - 6, 16); // vùng chạm điện
+    this.grids.add(zone); // thêm vào nhóm để kiểm tra va chạm
+  }
+
+  touchGrid(zone) { // người chơi dẫm lưới điện
+    if (this.dead || this.time.now < this.invulUntil) return; // đang bất tử thì bỏ qua
+    this.damagePlayer(1, this.player.x - this.facing * 10); // mất 1 máu, đẩy lùi
+    this.player.body.setVelocityY(-520); // điện hất bật lên
+    this.explode(this.player.x, GROUND_Y - 6, 0xffffff, 14); // tóe tia lửa
+    this.sfx('boss_down', 0.35); // tiếng rè điện
+  }
+
   addBlock(x, y, w, h) { // thêm 1 khối đặc có viền neon
     const r = this.add.rectangle(x, y, w, h, 0x0d0d1f).setOrigin(0).setStrokeStyle(3, this.lv.neon); // khối tối viền neon theo màu màn
     this.solids.add(r); // đưa vào nhóm khối đặc (tạo body tĩnh)
@@ -194,7 +220,9 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
 
   buildLevel() { // vẽ địa hình theo dữ liệu màn
     const lv = this.lv; // dữ liệu màn
-    for (const [a, b] of lv.ground) this.addBlock(a, GROUND_Y, b - a, GAME_H - GROUND_Y + 10); // các đoạn sàn, khe giữa là hố
+    this.solids.add(this.add.rectangle(0, GROUND_Y, LEVEL_W, GAME_H - GROUND_Y + 10).setOrigin(0)); // sàn liền cả màn, vô hình: đứng thẳng trên mặt sàn vẽ trong ảnh nền
+    this.grids = this.physics.add.staticGroup(); // nhóm lưới điện
+    for (let i = 1; i < lv.ground.length; i++) this.addGrid(lv.ground[i - 1][1], lv.ground[i][0]); // lưới điện nằm đúng chỗ hố cũ
     for (const [x, y, w] of lv.platforms) this.addBlock(x, y, w, 20); // bục nổi
     for (const [x, h] of lv.walls) this.addBlock(x, GROUND_Y - h, 40, h); // tường phải nhảy qua
     this.addBlock(ARENA_X - 20, 0, 20, 160); // mép trên cửa phòng boss (trang trí)
@@ -286,6 +314,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.physics.add.overlap(this.player, this.eBullets, (p, b) => { const bx = b.x, dmg = b.dmg || 1; b.destroy(); this.damagePlayer(dmg, bx); }); // trúng đạn địch (đạn DCO đau hơn)
     this.physics.add.overlap(this.player, this.cps, (p, c) => this.touchCheckpoint(c)); // chạm cột hồi sinh
     this.physics.add.overlap(this.player, this.spikes, (p, s) => this.damagePlayer(1, s.x)); // dẫm gai
+    this.physics.add.overlap(this.player, this.grids, (p, z) => this.touchGrid(z)); // dẫm lưới điện
     this.physics.add.overlap(this.player, this.items, (p, it) => { it.destroy(); this.hp = Math.min(this.maxHp, this.hp + 2); this.sfx('pickup'); }); // nhặt cục máu hồi 2 máu
   }
 

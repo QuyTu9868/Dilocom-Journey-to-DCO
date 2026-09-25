@@ -69,7 +69,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     for (const i of ['item_health', 'item_spikes', 'item_checkpoint_off', 'item_checkpoint_on']) this.load.image(i, `assets/items/${i}.png`); // nạp vật phẩm
     for (let i = 1; i <= 3; i++) this.load.image(`stage_bg_${i}`, `assets/background/stage_bg_${i}.jpg`); // nạp ảnh nền riêng của 3 màn
     for (const n of ['shoot', 'fan', 'dash']) this.load.image(`icon_${n}`, `assets/ui/icon_${n}.png`); // nạp 3 icon nút bắn và skill
-    for (const c of ['blue', 'yellow', 'pink']) for (const n of ['plat_l', 'plat_m', 'plat_r', 'wall', 'grid']) this.load.image(`${c}_${n}`, `assets/terrain/${c}_${n}.png`); // nạp ảnh địa hình 3 màu
+    for (const c of ['blue', 'yellow', 'pink']) for (const n of ['plat_l', 'plat_m', 'plat_r', 'wall', 'grid', 'gate_top', 'gate_mid', 'gate_bot']) this.load.image(`${c}_${n}`, `assets/terrain/${c}_${n}.png`); // nạp ảnh địa hình 3 màu
     for (const a of ['shoot', 'hit', 'jump', 'skill', 'enemy_fall', 'beep', 'explode_small', 'boss_down', 'explode_big', 'role_up', 'pickup', 'checkpoint', 'win', 'lose']) this.load.audio(a, `assets/audio/${a}.ogg`); // nạp 14 hiệu ứng âm thanh
     this.load.audio('music_stage', 'assets/audio/music_stage.mp3'); // nạp nhạc nền màn 1
     this.load.audio('music_level2', 'assets/audio/music_level2.mp3'); // nạp nhạc nền màn 2
@@ -199,6 +199,18 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.sfx('boss_down', 0.35); // tiếng rè điện
   }
 
+  drawGate(cx, y0, y1, top, bottom) { // vẽ cổng từ ảnh: đầu cổng, thân lặp dọc, chân cổng
+    const k = 34 / 151, c = this.lv.tc, parts = []; // tỉ lệ thu (thân rộng 34px), màu màn, danh sách mảnh
+    let m0 = y0, m1 = y1; // đoạn dành cho thân cổng
+    if (top) { parts.push(this.add.image(cx, y0, `${c}_gate_top`).setOrigin(0.5, 0).setScale(k)); m0 = y0 + 123 * k - 2; } // đầu cổng
+    if (bottom) { parts.push(this.add.image(cx, y1, `${c}_gate_bot`).setOrigin(0.5, 1).setScale(k)); m1 = y1 - 103 * k + 2; } // chân cổng
+    const mid = this.add.tileSprite(cx, m0, 34, m1 - m0, `${c}_gate_mid`).setOrigin(0.5, 0); // thân cổng lặp theo chiều dọc
+    mid.tileScaleX = mid.tileScaleY = k; // thu ảnh bên trong cho đúng cỡ
+    parts.unshift(mid); // thân vẽ dưới đầu và chân
+    for (const p of parts) p.setDepth(p === mid ? 6 : 7); // thân dưới, đầu và chân đè lên, tất cả dưới nhân vật
+    return parts; // trả về để làm hiệu ứng sập
+  }
+
   addPlatform(x, y, w) { // bục nổi ghép 3 mảnh ảnh: đầu trái, thân lặp, đầu phải
     this.solids.add(this.add.rectangle(x, y, w, 20).setOrigin(0)); // va chạm vô hình như cũ (mặt trên ở y)
     const H = 34, k = H / 100, c = this.lv.tc; // chiều cao hiển thị, tỉ lệ, màu màn
@@ -232,8 +244,10 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     for (let i = 1; i < lv.ground.length; i++) this.addGrid(lv.ground[i - 1][1], lv.ground[i][0]); // lưới điện nằm đúng chỗ hố cũ
     for (const [x, y, w] of lv.platforms) this.addPlatform(x, y, w); // bục nổi dùng ảnh
     for (const [x, h] of lv.walls) this.addWall(x, h); // tường dùng ảnh
-    this.addBlock(ARENA_X - 20, 0, 20, 160); // mép trên cửa phòng boss (trang trí)
-    this.addBlock(ARENA_X + GAME_W - 20, 0, 40, GROUND_Y); // tường mép phải phòng boss, không lao hay đi ra khỏi màn
+    this.solids.add(this.add.rectangle(ARENA_X, 0, 20, 160).setOrigin(0)); // va chạm phần trên cửa phòng boss
+    this.drawGate(ARENA_X + 10, 0, 160, true, false); // hình phần trên cửa, treo sẵn chờ sập
+    this.solids.add(this.add.rectangle(ARENA_X + GAME_W - 20, 0, 40, GROUND_Y).setOrigin(0)); // tường mép phải phòng boss, không lao hay đi ra khỏi màn
+    this.drawGate(ARENA_X + GAME_W - 10, 0, GROUND_Y, true, true); // hình cổng luôn đóng ở mép phải
     for (const x of lv.spikes) this.addSpikes(x); // gai
     for (const [x, y] of lv.health) this.addHealth(x, y); // cục máu đặt sẵn
     this.cps = this.physics.add.staticGroup(); // nhóm cột hồi sinh
@@ -824,7 +838,10 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.bossStarted = true; // đánh dấu đã vào
     this.cameras.main.stopFollow(); // ngừng bám nhân vật
     this.cameras.main.pan(ARENA_X + GAME_W / 2, GAME_H / 2, 600); // lia camera khoá phòng boss
-    this.addBlock(ARENA_X - 20, 160, 20, GROUND_Y - 160); // đóng cửa phòng, không chạy ra được
+    this.solids.add(this.add.rectangle(ARENA_X, 160, 20, GROUND_Y - 160).setOrigin(0)); // va chạm cửa đóng, không chạy ra được
+    const door = this.drawGate(ARENA_X + 10, 160, GROUND_Y, false, true); // phần dưới cửa
+    for (const o of door) o.y -= GROUND_Y - 160; // đặt sẵn phía trên, chuẩn bị sập xuống
+    this.tweens.add({ targets: door, y: `+=${GROUND_Y - 160}`, duration: 260, ease: 'Cubic.easeIn', onComplete: () => { this.cameras.main.shake(180, 0.01); this.sfx('explode_small', 0.5); } }); // cửa sập xuống, rung màn và kêu rầm
     this.respawnX = ARENA_X + 80; // rơi hố thì về đầu phòng boss
     const huge = this.lv.boss === 'dco'; // DCO to nhất
     const [bw, bh] = { dliever: [73, 87], dcoded: [74, 88], dco: [75, 106] }[this.lv.boss]; // hitbox khớp hình boss, nhỏ hơn hình một chút

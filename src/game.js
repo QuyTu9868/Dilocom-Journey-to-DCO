@@ -17,7 +17,7 @@ const LEVELS = { // dữ liệu từng màn
   1: { // màn 1 - xanh
     neon: 0x3399ff, bgTint: 0x6699ff, color: 0x3399ff, tc: 'blue', bgFloor: 778, music: 'music_stage', startRole: 'verified', boss: 'dliever', bossHp: 30, // màu, nhạc, role đầu màn, boss
     ground: [[0, 900], [1000, 1900], [2020, 2700], [2800, 3700], [3820, 4600], [4740, 5500], [5620, 6500], [6620, LEVEL_W]], // các đoạn sàn, khe giữa là hố
-    platforms: [[560, 380, 160], [1180, 370, 140], [1380, 300, 140], [2180, 370, 180], [2950, 370, 160], [3400, 360, 140], [3650, 300, 160], [4100, 370, 180], [4900, 360, 140], [5100, 290, 140], [5900, 370, 180], [6900, 360, 160], [7200, 300, 140]], // bục nổi
+    platforms: [[560, 380, 160], [1180, 370, 140], [1380, 300, 140], [2180, 370, 180], [2950, 370, 160], [3400, 360, 140], [3880, 320, 150], [4100, 370, 180], [4900, 360, 140], [5100, 290, 140], [5900, 370, 180], [6900, 360, 160], [7200, 300, 140]], // bục nổi
     walls: [[1640, 80], [4350, 80], [6200, 100]], // tường (x, cao)
     spikes: [1520, 2450, 4450, 5300, 6350], // vị trí gai
     health: [[5170, 250], [2270, 330]], // cục máu đặt sẵn
@@ -28,7 +28,7 @@ const LEVELS = { // dữ liệu từng màn
     neon: 0xffcc33, bgTint: 0xffcc77, color: 0xffcc33, tc: 'yellow', bgFloor: 798, music: 'music_level2', startRole: 'dliever', boss: 'dcoded', bossHp: 42, // màu, nhạc, role đầu màn, boss
     ground: [[0, 1000], [1120, 2000], [2150, 2900], [3050, 3800], [3950, 4700], [4850, 5600], [5750, 6500], [6650, LEVEL_W]], // các đoạn sàn
     platforms: [[500, 370, 160], [800, 300, 140], [1400, 360, 160], [1700, 290, 140], [2400, 370, 180], [3200, 360, 160], [3500, 290, 140], [4200, 370, 160], [4950, 360, 160], [5300, 290, 140], [6000, 370, 180], [6900, 360, 160], [7250, 300, 140]], // bục nổi
-    walls: [[1900, 90], [4500, 90], [6300, 110]], // tường
+    walls: [[1750, 90], [4500, 90], [6300, 110]], // tường
     spikes: [1300, 2600, 4100, 5450, 6150], // gai
     health: [[1770, 250], [5370, 250]], // cục máu
     checkpoints: [3100, 5800, 7450], // cột hồi sinh: 2 giữa màn + 1 trước boss
@@ -37,8 +37,8 @@ const LEVELS = { // dữ liệu từng màn
   3: { // màn 3 - hồng, trùm cuối
     neon: 0xff44cc, bgTint: 0xcc66ff, color: 0xff44cc, tc: 'pink', bgFloor: 796, music: 'music_level3', startRole: 'dcoded', boss: 'dco', bossHp: 60, // màu, nhạc, role đầu màn, boss
     ground: [[0, 800], [930, 1800], [1950, 2600], [2760, 3600], [3760, 4500], [4660, 5400], [5560, 6400], [6560, LEVEL_W]], // các đoạn sàn
-    platforms: [[450, 360, 150], [700, 290, 140], [1300, 360, 160], [1550, 290, 140], [2200, 360, 160], [3000, 370, 180], [3300, 300, 140], [4000, 360, 160], [4250, 290, 140], [4900, 370, 160], [5800, 360, 160], [6050, 290, 140], [6900, 360, 160], [7250, 300, 140]], // bục nổi
-    walls: [[1700, 100], [3500, 90], [5200, 110], [6300, 100]], // tường
+    platforms: [[450, 360, 150], [980, 300, 140], [1300, 360, 160], [1550, 290, 140], [2200, 360, 160], [3000, 370, 180], [3300, 300, 140], [4000, 360, 160], [4250, 290, 140], [4900, 370, 160], [5800, 360, 160], [6050, 290, 140], [6900, 360, 160], [7250, 300, 140]], // bục nổi
+    walls: [[1550, 100], [3350, 90], [5200, 110], [6150, 100]], // tường
     spikes: [1100, 2400, 3900, 4800, 5950, 6800], // gai
     health: [[1620, 250], [4320, 250], [6120, 250]], // cục máu
     checkpoints: [2850, 5650, 7450], // cột hồi sinh
@@ -69,7 +69,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     for (const i of ['item_health', 'item_spikes', 'item_checkpoint_off', 'item_checkpoint_on']) this.load.image(i, `assets/items/${i}.png`); // nạp vật phẩm
     for (let i = 1; i <= 3; i++) this.load.image(`stage_bg_${i}`, `assets/background/stage_bg_${i}.jpg`); // nạp ảnh nền riêng của 3 màn
     for (const n of ['shoot', 'fan', 'dash']) this.load.image(`icon_${n}`, `assets/ui/icon_${n}.png`); // nạp 3 icon nút bắn và skill
-    for (const c of ['blue', 'yellow', 'pink']) for (const n of ['plat_l', 'plat_m', 'plat_r', 'wall', 'grid', 'gate_top', 'gate_mid', 'gate_bot']) this.load.image(`${c}_${n}`, `assets/terrain/${c}_${n}.png`); // nạp ảnh địa hình 3 màu
+    for (const c of ['blue', 'yellow', 'pink']) for (const n of ['plat_l', 'plat_m', 'plat_r', 'wall', 'grid', 'gate_top', 'gate_mid', 'gate_bot', 'floor_m', 'floor_l', 'floor_r', 'pit_in']) this.load.image(`${c}_${n}`, `assets/terrain/${c}_${n}.png`); // nạp ảnh địa hình 3 màu
     for (const a of ['shoot', 'hit', 'jump', 'skill', 'enemy_fall', 'beep', 'explode_small', 'boss_down', 'explode_big', 'role_up', 'pickup', 'checkpoint', 'win', 'lose']) this.load.audio(a, `assets/audio/${a}.ogg`); // nạp 14 hiệu ứng âm thanh
     this.load.audio('music_stage', 'assets/audio/music_stage.mp3'); // nạp nhạc nền màn 1
     this.load.audio('music_level2', 'assets/audio/music_level2.mp3'); // nạp nhạc nền màn 2
@@ -181,6 +181,22 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     g.destroy(); // xoá bút vẽ
   }
 
+  addFloor(a, b) { // 1 đoạn sàn: va chạm + ảnh thân lặp, 2 đầu là mép vỡ nếu cạnh hố
+    this.solids.add(this.add.rectangle(a, GROUND_Y, b - a, GAME_H - GROUND_Y + 10).setOrigin(0)); // va chạm vô hình
+    const k = 0.5, c = this.lv.tc, top = GROUND_Y - 4; // tỉ lệ thu ảnh, màu màn, mép trên ảnh (vạch neon trùng mặt sàn)
+    const pitL = a > 0, pitR = b < LEVEL_W; // bên trái / phải có hố không
+    if (pitL) this.add.image(a - 10, top, `${c}_floor_r`).setOrigin(0, 0).setScale(k).setDepth(3); // mép vỡ đầu đoạn (sàn bắt đầu lại sau hố)
+    if (pitR) this.add.image(b + 10, top, `${c}_floor_l`).setOrigin(1, 0).setScale(k).setDepth(3); // mép vỡ cuối đoạn (sàn đứt, hố bắt đầu)
+    const x0 = pitL ? a + 70 : a, x1 = pitR ? b - 70 : b; // phần thân giữa
+    if (x1 > x0) { const m = this.add.tileSprite(x0, top, x1 - x0, 150, `${c}_floor_m`).setOrigin(0).setDepth(2); m.tileScaleX = m.tileScaleY = k; } // thân sàn lặp liền mạch
+  }
+
+  addPit(x0, x1) { // miệng hố: vực tối lặp ngang, nằm dưới 2 mép vỡ
+    const k = 0.5; // tỉ lệ thu ảnh
+    const pit = this.add.tileSprite(x0 - 20, GROUND_Y - 2, x1 - x0 + 40, 150, `${this.lv.tc}_pit_in`).setOrigin(0).setDepth(1); // vực tối che sàn vẽ trong ảnh nền
+    pit.tileScaleX = pit.tileScaleY = k; // thu ảnh cho đúng cỡ
+  }
+
   addGrid(x0, x1) { // lưới điện trên sàn: dẫm vào mất máu và bị hất lên
     const w = x1 - x0, color = this.lv.neon; // độ rộng và màu điện theo màn
     const k = 26 / 95; // tỉ lệ thu nhỏ ảnh lưới (cao khoảng 26px)
@@ -232,16 +248,16 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   }
 
   addSpikes(x) { // đặt gai trên sàn tại toạ độ x
-    const s = this.spikes.create(x, GROUND_Y, 'item_spikes').setOrigin(0.5, 1).setScale(0.5); // ảnh gai đứng trên sàn
+    const s = this.spikes.create(x, GROUND_Y, 'item_spikes').setOrigin(0.5, 1).setScale(0.5).setDepth(4); // ảnh gai đứng trên sàn
     s.refreshBody(); // cập nhật body theo kích thước mới
     return s; // trả về gai
   }
 
   buildLevel() { // vẽ địa hình theo dữ liệu màn
     const lv = this.lv; // dữ liệu màn
-    this.solids.add(this.add.rectangle(0, GROUND_Y, LEVEL_W, GAME_H - GROUND_Y + 10).setOrigin(0)); // sàn liền cả màn, vô hình: đứng thẳng trên mặt sàn vẽ trong ảnh nền
-    this.grids = this.physics.add.staticGroup(); // nhóm lưới điện
-    for (let i = 1; i < lv.ground.length; i++) this.addGrid(lv.ground[i - 1][1], lv.ground[i][0]); // lưới điện nằm đúng chỗ hố cũ
+    this.grids = this.physics.add.staticGroup(); // nhóm lưới điện (không còn dùng, giữ để va chạm cũ không lỗi)
+    for (const [a, b] of lv.ground) this.addFloor(a, b); // sàn từng đoạn bằng ảnh, giữa 2 đoạn là hố
+    for (let i = 1; i < lv.ground.length; i++) this.addPit(lv.ground[i - 1][1], lv.ground[i][0]); // miệng hố giữa 2 đoạn sàn
     for (const [x, y, w] of lv.platforms) this.addPlatform(x, y, w); // bục nổi dùng ảnh
     for (const [x, h] of lv.walls) this.addWall(x, h); // tường dùng ảnh
     this.solids.add(this.add.rectangle(ARENA_X, 0, 20, 160).setOrigin(0)); // va chạm phần trên cửa phòng boss

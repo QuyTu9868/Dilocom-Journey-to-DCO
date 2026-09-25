@@ -15,7 +15,7 @@ const ARENA_X = 7600; // mép trái phòng boss
 const ROLES = { verified: { maxHp: 7 }, dliever: { maxHp: 10 }, dcoded: { maxHp: 15 } }; // máu tối đa theo role
 const LEVELS = { // dữ liệu từng màn
   1: { // màn 1 - xanh
-    neon: 0x3399ff, bgTint: 0x6699ff, color: 0x3399ff, bgFloor: 778, music: 'music_stage', startRole: 'verified', boss: 'dliever', bossHp: 30, // màu, nhạc, role đầu màn, boss
+    neon: 0x3399ff, bgTint: 0x6699ff, color: 0x3399ff, tc: 'blue', bgFloor: 778, music: 'music_stage', startRole: 'verified', boss: 'dliever', bossHp: 30, // màu, nhạc, role đầu màn, boss
     ground: [[0, 900], [1000, 1900], [2020, 2700], [2800, 3700], [3820, 4600], [4740, 5500], [5620, 6500], [6620, LEVEL_W]], // các đoạn sàn, khe giữa là hố
     platforms: [[560, 380, 160], [1180, 370, 140], [1380, 300, 140], [2180, 370, 180], [2950, 370, 160], [3400, 360, 140], [3650, 300, 160], [4100, 370, 180], [4900, 360, 140], [5100, 290, 140], [5900, 370, 180], [6900, 360, 160], [7200, 300, 140]], // bục nổi
     walls: [[1640, 80], [4350, 80], [6200, 100]], // tường (x, cao)
@@ -25,7 +25,7 @@ const LEVELS = { // dữ liệu từng màn
     enemies: [['bot_1_1', 'WALKER', 520], ['bot_1_2', 'FLYER', 1100], ['bot_1_1', 'WALKER', 1300], ['bot_1_3', 'CHARGER', 1850], ['bot_1_2', 'FLYER', 2300], ['bot_1_1', 'WALKER', 2550], ['bot_1_1', 'SHOOTER', 3030, 370], ['bot_1_3', 'CHARGER', 3300], ['bot_1_1', 'WALKER', 3900], ['bot_1_2', 'FLYER', 4200], ['bot_1_1', 'WALKER', 4900], ['bot_1_1', 'SHOOTER', 5170, 290], ['bot_1_3', 'CHARGER', 5400], ['bot_1_2', 'FLYER', 5800], ['bot_1_1', 'WALKER', 6000], ['bot_1_1', 'WALKER', 6800], ['bot_1_2', 'FLYER', 7000], ['bot_1_3', 'CHARGER', 7400]], // quái (tên, kiểu, x, mặt đứng)
   },
   2: { // màn 2 - vàng
-    neon: 0xffcc33, bgTint: 0xffcc77, color: 0xffcc33, bgFloor: 798, music: 'music_level2', startRole: 'dliever', boss: 'dcoded', bossHp: 42, // màu, nhạc, role đầu màn, boss
+    neon: 0xffcc33, bgTint: 0xffcc77, color: 0xffcc33, tc: 'yellow', bgFloor: 798, music: 'music_level2', startRole: 'dliever', boss: 'dcoded', bossHp: 42, // màu, nhạc, role đầu màn, boss
     ground: [[0, 1000], [1120, 2000], [2150, 2900], [3050, 3800], [3950, 4700], [4850, 5600], [5750, 6500], [6650, LEVEL_W]], // các đoạn sàn
     platforms: [[500, 370, 160], [800, 300, 140], [1400, 360, 160], [1700, 290, 140], [2400, 370, 180], [3200, 360, 160], [3500, 290, 140], [4200, 370, 160], [4950, 360, 160], [5300, 290, 140], [6000, 370, 180], [6900, 360, 160], [7250, 300, 140]], // bục nổi
     walls: [[1900, 90], [4500, 90], [6300, 110]], // tường
@@ -35,7 +35,7 @@ const LEVELS = { // dữ liệu từng màn
     enemies: [['bot_2_1', 'WALKER', 600], ['bot_2_3', 'FLYER', 1000], ['bot_2_1', 'WALKER', 1500], ['bot_2_1', 'WALKER', 1560], ['bot_2_2', 'SHOOTER', 1760, 290], ['bot_2_3', 'FLYER', 2500], ['bot_2_1', 'WALKER', 3300], ['bot_2_1', 'WALKER', 3350], ['bot_2_2', 'SHOOTER', 3570, 290], ['bot_2_3', 'FLYER', 4000], ['bot_2_1', 'WALKER', 4300], ['bot_2_2', 'SHOOTER', 5030, 360], ['bot_2_1', 'WALKER', 5100], ['bot_2_3', 'FLYER', 5700], ['bot_2_1', 'WALKER', 6100], ['bot_2_1', 'WALKER', 6150], ['bot_2_1', 'WALKER', 6900], ['bot_2_3', 'FLYER', 7000], ['bot_2_2', 'SHOOTER', 7320, 300]], // quái màn 2
   },
   3: { // màn 3 - hồng, trùm cuối
-    neon: 0xff44cc, bgTint: 0xcc66ff, color: 0xff44cc, bgFloor: 796, music: 'music_level3', startRole: 'dcoded', boss: 'dco', bossHp: 60, // màu, nhạc, role đầu màn, boss
+    neon: 0xff44cc, bgTint: 0xcc66ff, color: 0xff44cc, tc: 'pink', bgFloor: 796, music: 'music_level3', startRole: 'dcoded', boss: 'dco', bossHp: 60, // màu, nhạc, role đầu màn, boss
     ground: [[0, 800], [930, 1800], [1950, 2600], [2760, 3600], [3760, 4500], [4660, 5400], [5560, 6400], [6560, LEVEL_W]], // các đoạn sàn
     platforms: [[450, 360, 150], [700, 290, 140], [1300, 360, 160], [1550, 290, 140], [2200, 360, 160], [3000, 370, 180], [3300, 300, 140], [4000, 360, 160], [4250, 290, 140], [4900, 370, 160], [5800, 360, 160], [6050, 290, 140], [6900, 360, 160], [7250, 300, 140]], // bục nổi
     walls: [[1700, 100], [3500, 90], [5200, 110], [6300, 100]], // tường
@@ -68,6 +68,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     for (const i of ['item_health', 'item_spikes', 'item_checkpoint_off', 'item_checkpoint_on']) this.load.image(i, `assets/items/${i}.png`); // nạp vật phẩm
     for (let i = 1; i <= 3; i++) this.load.image(`stage_bg_${i}`, `assets/background/stage_bg_${i}.jpg`); // nạp ảnh nền riêng của 3 màn
     for (const n of ['shoot', 'fan', 'dash']) this.load.image(`icon_${n}`, `assets/ui/icon_${n}.png`); // nạp 3 icon nút bắn và skill
+    for (const c of ['blue', 'yellow', 'pink']) for (const n of ['plat_l', 'plat_m', 'plat_r', 'wall', 'grid']) this.load.image(`${c}_${n}`, `assets/terrain/${c}_${n}.png`); // nạp ảnh địa hình 3 màu
     for (const a of ['shoot', 'hit', 'jump', 'skill', 'enemy_fall', 'beep', 'explode_small', 'boss_down', 'explode_big', 'role_up', 'pickup', 'checkpoint', 'win', 'lose']) this.load.audio(a, `assets/audio/${a}.ogg`); // nạp 14 hiệu ứng âm thanh
     this.load.audio('music_stage', 'assets/audio/music_stage.mp3'); // nạp nhạc nền màn 1
     this.load.audio('music_level2', 'assets/audio/music_level2.mp3'); // nạp nhạc nền màn 2
@@ -181,19 +182,10 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
 
   addGrid(x0, x1) { // lưới điện trên sàn: dẫm vào mất máu và bị hất lên
     const w = x1 - x0, color = this.lv.neon; // độ rộng và màu điện theo màn
-    const g = this.add.graphics().setDepth(4); // bút vẽ lưới
-    const zap = this.add.graphics().setDepth(5); // bút vẽ tia điện chạy ngang
-    g.fillStyle(0x05050c, 0.85).fillRect(x0, GROUND_Y - 6, w, 14); // nền tối của tấm lưới
-    g.lineStyle(2, color, 0.9); // nét lưới neon
-    for (let x = x0; x <= x1; x += 12) g.lineBetween(x, GROUND_Y - 6, x + 6, GROUND_Y + 8); // gạch chéo xuôi
-    for (let x = x0 + 6; x <= x1 + 6; x += 12) g.lineBetween(x, GROUND_Y - 6, x - 6, GROUND_Y + 8); // gạch chéo ngược
-    g.lineStyle(3, color, 1).strokeRect(x0, GROUND_Y - 6, w, 14); // viền tấm lưới
-    this.time.addEvent({ delay: 110, loop: true, callback: () => { // tia điện nhảy liên tục
-      zap.clear().lineStyle(2, 0xffffff, 0.9); // nét trắng sáng
-      let px = x0, py = GROUND_Y - 10; // điểm đầu tia
-      while (px < x1) { const nx = Math.min(x1, px + Phaser.Math.Between(10, 22)), ny = GROUND_Y - Phaser.Math.Between(4, 20); zap.lineBetween(px, py, nx, ny); px = nx; py = ny; } // tia zíc zắc ngẫu nhiên
-      zap.setAlpha(Math.random() < 0.3 ? 0 : 1); // thỉnh thoảng tắt để nhấp nháy
-    } });
+    const k = 26 / 95; // tỉ lệ thu nhỏ ảnh lưới (cao khoảng 26px)
+    const img = this.add.tileSprite(x0, GROUND_Y + 6, w, 95 * k, `${this.lv.tc}_grid`).setOrigin(0, 1).setDepth(4); // ảnh lưới điện lặp theo chiều ngang
+    img.tileScaleX = img.tileScaleY = k; // thu ảnh bên trong cho đúng cỡ
+    this.tweens.add({ targets: img, alpha: 0.6, yoyo: true, repeat: -1, duration: 90, repeatDelay: 250 }); // chớp nhẹ như đang phóng điện
     const zone = this.add.zone(x0 + w / 2, GROUND_Y - 4, w - 6, 16); // vùng chạm điện
     this.grids.add(zone); // thêm vào nhóm để kiểm tra va chạm
   }
@@ -204,6 +196,20 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.player.body.setVelocityY(-520); // điện hất bật lên
     this.explode(this.player.x, GROUND_Y - 6, 0xffffff, 14); // tóe tia lửa
     this.sfx('boss_down', 0.35); // tiếng rè điện
+  }
+
+  addPlatform(x, y, w) { // bục nổi ghép 3 mảnh ảnh: đầu trái, thân lặp, đầu phải
+    this.solids.add(this.add.rectangle(x, y, w, 20).setOrigin(0)); // va chạm vô hình như cũ (mặt trên ở y)
+    const H = 34, k = H / 100, c = this.lv.tc; // chiều cao hiển thị, tỉ lệ, màu màn
+    const capW = Math.min(184 * k, w / 2); // bề ngang mỗi đầu bục
+    this.add.image(x, y - 3, `${c}_plat_l`).setOrigin(0).setDisplaySize(capW, H).setDepth(3); // đầu trái
+    this.add.image(x + w, y - 3, `${c}_plat_r`).setOrigin(1, 0).setDisplaySize(capW, H).setDepth(3); // đầu phải
+    if (w - 2 * capW > 1) { const mid = this.add.tileSprite(x + capW, y - 3, w - 2 * capW, H, `${c}_plat_m`).setOrigin(0).setDepth(3); mid.tileScaleX = mid.tileScaleY = k; } // thân giữa lặp liền mạch
+  }
+
+  addWall(x, h) { // tường thấp dùng ảnh cột
+    this.solids.add(this.add.rectangle(x, GROUND_Y - h, 40, h).setOrigin(0)); // va chạm vô hình như cũ
+    this.add.image(x + 20, GROUND_Y + 2, `${this.lv.tc}_wall`).setOrigin(0.5, 1).setDisplaySize(54, h + 6).setDepth(3); // ảnh cột, nhỉnh hơn va chạm một chút
   }
 
   addBlock(x, y, w, h) { // thêm 1 khối đặc có viền neon
@@ -223,8 +229,8 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.solids.add(this.add.rectangle(0, GROUND_Y, LEVEL_W, GAME_H - GROUND_Y + 10).setOrigin(0)); // sàn liền cả màn, vô hình: đứng thẳng trên mặt sàn vẽ trong ảnh nền
     this.grids = this.physics.add.staticGroup(); // nhóm lưới điện
     for (let i = 1; i < lv.ground.length; i++) this.addGrid(lv.ground[i - 1][1], lv.ground[i][0]); // lưới điện nằm đúng chỗ hố cũ
-    for (const [x, y, w] of lv.platforms) this.addBlock(x, y, w, 20); // bục nổi
-    for (const [x, h] of lv.walls) this.addBlock(x, GROUND_Y - h, 40, h); // tường phải nhảy qua
+    for (const [x, y, w] of lv.platforms) this.addPlatform(x, y, w); // bục nổi dùng ảnh
+    for (const [x, h] of lv.walls) this.addWall(x, h); // tường dùng ảnh
     this.addBlock(ARENA_X - 20, 0, 20, 160); // mép trên cửa phòng boss (trang trí)
     this.addBlock(ARENA_X + GAME_W - 20, 0, 40, GROUND_Y); // tường mép phải phòng boss, không lao hay đi ra khỏi màn
     for (const x of lv.spikes) this.addSpikes(x); // gai

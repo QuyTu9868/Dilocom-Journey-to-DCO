@@ -48,7 +48,7 @@ const LEVELS = { // dữ liệu từng màn
 const PLAYER_FRAMES = ['idle_1', 'idle_2', 'run_1', 'run_2', 'run_3', 'run_4', 'jump_up', 'jump_down', 'shoot_1', 'shoot_2', 'hit_1', 'death_1', 'death_2']; // 13 khung nhân vật
 const ENEMY_FRAMES = ['move_1', 'move_2', 'jump_up', 'jump_down', 'attack_1', 'death_1', 'death_2']; // 7 khung quái
 const V2_SPEC = { idle: [4, 5.5], run: [8, 9], jump: [6, 0], shoot: [3, 9], hit: [2, 8], death: [4, 5] }; // bộ vẽ mới: [số khung, hình/giây]
-const V2 = { verified: { ...V2_SPEC, runshoot: [8, 9] }, dliever: { ...V2_SPEC, runshoot: [8, 9] }, dcoded: { ...V2_SPEC, runshoot: [8, 9] }, dco: { idle: [4, 5.5], runshoot: [8, 9], dash: [5, 9], shoot: [3, 8], hit: [2, 10], death: [4, 5] } }; // dco là boss: có dash, không có run/jump
+const V2 = { verified: { ...V2_SPEC, runshoot: [8, 9] }, dliever: { ...V2_SPEC, runshoot: [8, 9] }, dcoded: { ...V2_SPEC, runshoot: [8, 9] }, dco: { idle: [4, 5.5], run: [8, 9], runshoot: [8, 9], dash: [5, 9], shoot: [3, 8], hit: [2, 10], death: [4, 5] } }; // dco là boss: có run và dash, không có jump
 const FACES_LEFT = { dco: true }; // hình vẽ quay mặt sang trái (các nhân vật khác quay phải) // các role đã có bộ vẽ mới (kèm khung vừa chạy vừa bắn)
 const V2_MAP = { jump_up: 'jump_2', jump_down: 'jump_5', death_1: 'death_2', death_2: 'death_4' }; // đổi tên khung cũ sang khung mới (dùng cho boss)
 function frameKey(role, name) { return `${role}_${V2[role] && V2_MAP[name] ? V2_MAP[name] : name}`; } // tên khung đúng theo bộ vẽ của role

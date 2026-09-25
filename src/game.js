@@ -48,7 +48,8 @@ const LEVELS = { // dữ liệu từng màn
 const PLAYER_FRAMES = ['idle_1', 'idle_2', 'run_1', 'run_2', 'run_3', 'run_4', 'jump_up', 'jump_down', 'shoot_1', 'shoot_2', 'hit_1', 'death_1', 'death_2']; // 13 khung nhân vật
 const ENEMY_FRAMES = ['move_1', 'move_2', 'jump_up', 'jump_down', 'attack_1', 'death_1', 'death_2']; // 7 khung quái
 const V2_SPEC = { idle: [4, 5.5], run: [8, 12.5], jump: [6, 0], shoot: [3, 9], hit: [2, 8], death: [4, 5] }; // bộ vẽ mới: [số khung, hình/giây]
-const V2 = { verified: { ...V2_SPEC, runshoot: [8, 12.5] }, dliever: { ...V2_SPEC, runshoot: [8, 12.5] }, dcoded: { ...V2_SPEC, runshoot: [8, 12.5] } }; // các role đã có bộ vẽ mới (kèm khung vừa chạy vừa bắn)
+const V2 = { verified: { ...V2_SPEC, runshoot: [8, 12.5] }, dliever: { ...V2_SPEC, runshoot: [8, 12.5] }, dcoded: { ...V2_SPEC, runshoot: [8, 12.5] }, dco: { idle: [4, 5.5], runshoot: [8, 12.5], dash: [5, 9], shoot: [3, 8], hit: [2, 10], death: [4, 5] } }; // dco là boss: có dash, không có run/jump
+const FACES_LEFT = { dco: true }; // hình vẽ quay mặt sang trái (các nhân vật khác quay phải) // các role đã có bộ vẽ mới (kèm khung vừa chạy vừa bắn)
 const V2_MAP = { jump_up: 'jump_2', jump_down: 'jump_5', death_1: 'death_2', death_2: 'death_4' }; // đổi tên khung cũ sang khung mới (dùng cho boss)
 function frameKey(role, name) { return `${role}_${V2[role] && V2_MAP[name] ? V2_MAP[name] : name}`; } // tên khung đúng theo bộ vẽ của role
 const MINION_SIZE = { bot_1_1: [0.339, 48, 49], bot_1_2: [0.307, 45, 49], bot_1_3: [0.256, 44, 49], bot_2_1: [0.216, 30, 49], bot_2_2: [0.246, 39, 49], bot_2_3: [0.359, 72, 49], bot_3_1: [0.351, 60, 74], bot_3_2: [0.237, 36, 49], bot_3_3: [0.311, 56, 49] }; // [tỉ lệ vẽ để cao bằng người chơi (xe tăng 1.5 lần), rộng hitbox, cao hitbox]
@@ -158,7 +159,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       if (this.anims.exists(`${k}_idle`)) continue; // đã tạo rồi thì bỏ qua (khi chơi lại)
       if (V2[k]) { // bộ vẽ mới
         const seq = (a) => Array.from({ length: V2[k][a][0] }, (_, i) => ({ key: `${k}_${a}_${i + 1}` })); // danh sách khung của 1 động tác
-        for (const [a, rep] of [['idle', -1], ['run', -1], ['runshoot', -1], ['shoot', 0], ['hit', 0], ['death', 0]]) if (V2[k][a]) this.anims.create({ key: `${k}_${a}`, frames: seq(a), frameRate: V2[k][a][1], repeat: rep }); // tạo animation theo nhịp của file gốc
+        for (const [a, rep] of [['idle', -1], ['run', -1], ['runshoot', -1], ['dash', -1], ['shoot', 0], ['hit', 0], ['death', 0]]) if (V2[k][a]) this.anims.create({ key: `${k}_${a}`, frames: seq(a), frameRate: V2[k][a][1], repeat: rep }); // tạo animation theo nhịp của file gốc
         continue; // xong nhân vật này
       }
       this.anims.create({ key: `${k}_idle`, frames: [{ key: `${k}_idle_1` }, { key: `${k}_idle_2` }], frameRate: 3, repeat: -1 }); // đứng yên lặp 2 khung
@@ -826,12 +827,12 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.addBlock(ARENA_X - 20, 160, 20, GROUND_Y - 160); // đóng cửa phòng, không chạy ra được
     this.respawnX = ARENA_X + 80; // rơi hố thì về đầu phòng boss
     const huge = this.lv.boss === 'dco'; // DCO to nhất
-    const [bw, bh] = { dliever: [73, 87], dcoded: [74, 88], dco: [99, 106] }[this.lv.boss]; // hitbox khớp hình boss, nhỏ hơn hình một chút
+    const [bw, bh] = { dliever: [73, 87], dcoded: [74, 88], dco: [75, 106] }[this.lv.boss]; // hitbox khớp hình boss, nhỏ hơn hình một chút
     const box = this.add.rectangle(ARENA_X + 760, GROUND_Y - bh / 2 - 2, bw, bh); // hitbox boss
     this.physics.add.existing(box); // gắn body
     this.physics.add.collider(box, this.solids); // boss đứng trên sàn
     const key = this.lv.boss; // tên boss của màn
-    const spr = this.add.sprite(box.x, box.y, `${key}_idle_1`).setOrigin(0.5, 1).setScale(huge ? 0.95 : 0.75).setDepth(9); // hình vẽ boss
+    const spr = this.add.sprite(box.x, box.y, `${key}_idle_1`).setOrigin(0.5, 1).setScale(huge ? 0.78 : 0.75).setDepth(9); // hình vẽ boss (DCO cao khoảng 132px)
     spr.play(`${key}_idle`); // boss đứng thở
     this.boss = { key, box, spr, hp: this.lv.bossHp, maxHp: this.lv.bossHp, state: 'alive', step: 0 }; // dữ liệu boss
     this.bossDashHit = -1; // cú lao cuối đã trúng boss
@@ -852,7 +853,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     b.spr.x = b.box.x; // hình bám x hitbox
     b.spr.y = b.box.body.bottom; // chân hình ở đáy hitbox
     if (b.state !== 'alive') return; // chết rồi thì thôi
-    if (!b.dashing) b.spr.setFlipX(this.player.x < b.box.x); // quay mặt về người chơi (lúc lao thì giữ hướng)
+    if (!b.dashing) this.bossFace(b, this.player.x < b.box.x); // quay mặt về người chơi (lúc lao thì giữ hướng)
     if (b.box.body.blocked.down && b.jumping && this.time.now > b.jumpAt + 200) { b.jumping = false; b.box.body.setVelocityX(0); } // đáp đất sau cú nhảy (bỏ qua lúc vừa bật khỏi đất)
     if (!b.acting && !b.dashing && !b.jumping && b.box.body.blocked.down) this.bossWalk(b); // giữa các đòn thì đi bộ
     this.bossBar.width = 500 * b.hp / b.maxHp; // cập nhật thanh máu boss
@@ -897,7 +898,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     if (b.state !== 'alive' || this.dead) return; // hết trận thì thôi
     const dir = this.player.x < b.box.x ? -1 : 1; // lao về phía người chơi
     const endX = dir > 0 ? ARENA_X + GAME_W - 60 : ARENA_X + 60; // điểm dừng ở mép phòng
-    b.spr.setFlipX(dir < 0); // quay mặt về hướng lao
+    this.bossFace(b, dir < 0); // quay mặt về hướng lao
     b.dashing = true; // giữ hướng mặt trong lúc lấy đà và lao
     b.box.body.setVelocityX(-dir * 120); // lùi lấy đà
     const lineX = Math.min(b.box.x, endX), lineW = Math.abs(endX - b.box.x); // vùng vạch đỏ
@@ -906,7 +907,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.time.delayedCall(b.fast ? 550 : 800, () => { // hết báo trước (DCO nổi điên thì báo ngắn hơn)
       line.destroy(); // xoá vạch
       if (b.state !== 'alive') return; // boss chết thì thôi
-      b.spr.play(`${b.key}_run`); // chạy animation lao
+      b.spr.play(this.anims.exists(`${b.key}_dash`) ? `${b.key}_dash` : `${b.key}_run`); // animation lao (DCO có khung dash riêng)
       b.box.body.setVelocityX(dir * (b.fast ? 800 : 650)); // lao nhanh
       const ghostEv = this.time.addEvent({ delay: 40, loop: true, callback: () => { // để lại vệt vàng mờ
         const g = this.add.image(b.spr.x, b.spr.y, b.spr.texture.key).setOrigin(0.5, 1).setScale(b.spr.scale).setFlipX(b.spr.flipX).setTintFill(this.lv.color).setAlpha(0.5).setDepth(8); // bóng mờ boss
@@ -966,6 +967,10 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.time.delayedCall(400, () => this.bossNext()); // hết đạn thì nghỉ chút rồi đánh tiếp
   }
 
+  bossFace(b, left) { // quay boss về trái hoặc phải, tính cả hình vẽ gốc quay hướng nào
+    b.spr.setFlipX(left !== !!FACES_LEFT[b.key]); // hình gốc quay trái thì đảo ngược việc lật
+  }
+
   bossWalk(b) { // boss đi bộ giữa các đòn, mỗi con một kiểu
     const dx = this.player.x - b.box.x, dist = Math.abs(dx), dir = Math.sign(dx) || 1; // khoảng cách và hướng tới người chơi
     let v = 0; // tốc độ đi
@@ -974,7 +979,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     const nx = b.box.x + v * 0.15; // vị trí sắp tới
     if (nx < ARENA_X + 70 || nx > ARENA_X + GAME_W - 70) v = 0; // không ra khỏi phòng boss
     b.box.body.setVelocityX(v); // đi
-    if (v !== 0) this.playAnim(b.spr, `${b.key}_run`); // đang đi thì chạy animation bước
+    if (v !== 0) this.playAnim(b.spr, this.anims.exists(`${b.key}_run`) ? `${b.key}_run` : `${b.key}_runshoot`); // đang đi thì chạy animation bước (DCO dùng khung chạy bắn)
     else this.playAnim(b.spr, `${b.key}_idle`); // đứng thì thở
   }
 

@@ -53,6 +53,7 @@ const FACES_LEFT = { dco: true }; // hình vẽ quay mặt sang trái (các nhâ
 const V2_MAP = { jump_up: 'jump_2', jump_down: 'jump_5', death_1: 'death_2', death_2: 'death_4' }; // đổi tên khung cũ sang khung mới (dùng cho boss)
 function frameKey(role, name) { return `${role}_${V2[role] && V2_MAP[name] ? V2_MAP[name] : name}`; } // tên khung đúng theo bộ vẽ của role
 const CHARGER_V2 = ['bot_1_3', 'bot_3_3']; // 2 con lao tới có bộ vẽ mới: đi 4 khung, lao 2 khung, dừng 1 khung
+const BULLET_K = ('ontouchstart' in window || navigator.maxTouchPoints > 0) ? 1.6 : 1; // máy cảm ứng (mobile): đạn to gấp 1.6 lần cho dễ nhìn
 const MINION_SIZE = { bot_1_1: [0.339, 48, 49], bot_1_2: [0.307, 45, 49], bot_1_3: [0.359, 42, 49], bot_2_1: [0.216, 30, 49], bot_2_2: [0.246, 39, 49], bot_2_3: [0.359, 72, 49], bot_3_1: [0.351, 60, 74], bot_3_2: [0.237, 36, 49], bot_3_3: [0.394, 55, 49] }; // [tỉ lệ vẽ để cao bằng người chơi (xe tăng 1.5 lần), rộng hitbox, cao hitbox]
 const CHAR_KEYS = ['verified', 'dliever', 'dcoded', 'dco']; // các nhân vật cần nạp
 const BOT_KEYS = ['bot_1_1', 'bot_1_2', 'bot_1_3', 'bot_2_1', 'bot_2_2', 'bot_2_3', 'bot_3_1', 'bot_3_2', 'bot_3_3']; // 9 quái của 3 màn
@@ -658,7 +659,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.shootAnimUntil = time + (V2[this.role] ? 340 : 200); // giữ tư thế bắn (bộ mới đủ 3 khung: giơ tay, chớp lửa, thu tay)
     const v2 = V2[this.role], b0 = this.player.body; // bộ vẽ của role và body nhân vật
     if (!(v2 && v2.runshoot && b0.velocity.x !== 0 && b0.blocked.down)) this.pSprite.play(`${this.role}_shoot`); // đứng bắn thì chạy lại animation bắn, còn chạy bắn thì để chân bước tiếp
-    const b = this.pBullets.create(this.player.x + this.facing * 28, this.player.y - 4, 'bullet_player').setScale(0.1); // tạo viên đạn trước mặt
+    const b = this.pBullets.create(this.player.x + this.facing * 28, this.player.y - 4, 'bullet_player').setScale(0.1 * BULLET_K); // tạo viên đạn trước mặt
     b.setFlipX(this.facing < 0); // quay đạn theo hướng bắn
     b.body.setAllowGravity(false); // đạn bay thẳng
     b.setVelocityX(this.facing * 820); // tốc độ đạn (nhanh hơn)
@@ -676,7 +677,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     const base = this.facing > 0 ? 0 : Math.PI; // hướng gốc theo hướng nhìn
     for (const deg of [-20, -10, 0, 10, 20]) { // 5 viên tỏa hình quạt
       const ang = base + Phaser.Math.DegToRad(deg); // góc từng viên
-      const b = this.pBullets.create(this.player.x + this.facing * 28, this.player.y - 4, 'bullet_player').setScale(0.13); // viên đạn to hơn đạn thường
+      const b = this.pBullets.create(this.player.x + this.facing * 28, this.player.y - 4, 'bullet_player').setScale(0.13 * BULLET_K); // viên đạn to hơn đạn thường
       b.body.setAllowGravity(false); // bay thẳng
       b.setVelocity(Math.cos(ang) * 650, Math.sin(ang) * 650); // tốc độ theo góc
       b.setRotation(ang); // xoay hình theo hướng bay
@@ -799,7 +800,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   }
 
   enemyShoot(e, dir, aim) { // quái bắn 1 viên đạn spam
-    const b = this.eBullets.create(e.box.x, e.box.y - 10, 'bullet_spam').setScale(0.09).setTint(e.color); // tạo đạn tint màu màn
+    const b = this.eBullets.create(e.box.x, e.box.y - 10, 'bullet_spam').setScale(0.09 * BULLET_K).setTint(e.color); // tạo đạn tint màu màn
     b.body.setAllowGravity(false); // đạn bay thẳng
     const ang = aim ? Phaser.Math.Angle.Between(b.x, b.y, this.player.x, this.player.y) : (dir > 0 ? 0 : Math.PI); // có nhắm thì bắn về người chơi, không thì bắn ngang
     b.setVelocity(Math.cos(ang) * 260, Math.sin(ang) * 260); // tốc độ đạn quái
@@ -990,7 +991,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     const dir = Phaser.Math.Angle.Between(b.box.x, b.box.y, this.player.x, this.player.y); // hướng tới người chơi
     for (const deg of [-25, 0, 25]) { // 3 viên tỏa ra
       const ang = dir + Phaser.Math.DegToRad(deg); // góc từng viên
-      const bl = this.eBullets.create(b.box.x, b.box.y, 'bullet_boss').setScale(0.11).setTint(0xffcc33); // đạn vàng
+      const bl = this.eBullets.create(b.box.x, b.box.y, 'bullet_boss').setScale(0.11 * BULLET_K).setTint(0xffcc33); // đạn vàng
       bl.body.setAllowGravity(false); // bay thẳng
       bl.setVelocity(Math.cos(ang) * 240, Math.sin(ang) * 240); // tốc độ theo góc
       bl.setRotation(ang); // xoay theo hướng bay
@@ -1039,7 +1040,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     const dir = Phaser.Math.Angle.Between(b.box.x, b.box.y + 20, this.player.x, this.player.y); // hướng gốc nhắm thẳng người chơi
     for (const deg of [-40, -20, 0, 20, 40]) { // 5 góc tỏa quạt rộng, có khe giữa các tia để né
       const ang = dir + Phaser.Math.DegToRad(deg); // góc bắn từng tia
-      const bl = this.eBullets.create(b.box.x, b.box.y + 20, 'bullet_boss').setScale(0.1).setTint(tint); // đạn boss tint theo màu boss
+      const bl = this.eBullets.create(b.box.x, b.box.y + 20, 'bullet_boss').setScale(0.1 * BULLET_K).setTint(tint); // đạn boss tint theo màu boss
       bl.dmg = dmg; // sát thương của viên đạn
       bl.body.setAllowGravity(false); // bay thẳng
       bl.setVelocity(Math.cos(ang) * speed, Math.sin(ang) * speed); // tốc độ theo góc

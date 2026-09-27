@@ -117,7 +117,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.setupInput(); // cài phím
     this.cameras.main.setBounds(0, 0, LEVEL_W, GAME_H); // giới hạn camera trong màn
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1); // camera bám nhân vật
-    const help = this.add.text(GAME_W / 2, 60, tr(`MÀN ${this.level}   `, `STAGE ${this.level}   `) + (this.scheme === 'wasd' ? tr('A D đi   W nhảy   J bắn   K L skill   P dừng', 'A D move   W jump   J shoot   K L skill   P pause') : tr('← → đi   ↑ nhảy   A bắn   S D skill   P dừng', '← → move   ↑ jump   A shoot   S D skill   P pause')), { fontFamily: FONT, fontSize: 18, color: '#aaddff', stroke: '#000', strokeThickness: 4 }).setOrigin(0.5).setScrollFactor(0).setDepth(100); // hướng dẫn phím đầu màn
+    const help = this.add.text(GAME_W / 2, 60, tr(`MÀN ${this.level}   `, `STAGE ${this.level}   `) + (this.scheme === 'wasd' ? tr('A D đi   Space nhảy   J bắn   K L skill   P dừng', 'A D move   Space jump   J shoot   K L skill   P pause') : tr('← → đi   Space nhảy   A bắn   S D skill   P dừng', '← → move   Space jump   A shoot   S D skill   P pause')), { fontFamily: FONT, fontSize: 18, color: '#aaddff', stroke: '#000', strokeThickness: 4 }).setOrigin(0.5).setScrollFactor(0).setDepth(100); // hướng dẫn phím đầu màn
     this.tweens.add({ targets: help, alpha: 0, delay: 5000, duration: 800 }); // mờ dần sau 5 giây
     this.boss = null; // chưa có boss
     this.bossStarted = false; // chưa vào phòng boss
@@ -369,8 +369,8 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   setupInput() { // cài phím điều khiển
     this.scheme = this.registry.get('scheme') || 'arrows'; // kiểu điều khiển đã chọn ở menu
     const map = this.scheme === 'wasd' // bảng phím theo kiểu điều khiển
-      ? { left: 'A', right: 'D', jump: 'W', shoot: 'J', skill1: 'K', skill2: 'L' } // kiểu FPS: WASD, J bắn, K L skill
-      : { left: 'LEFT', right: 'RIGHT', jump: 'UP', shoot: 'A', skill1: 'S', skill2: 'D' }; // kiểu mũi tên: A bắn, S D skill
+      ? { left: 'A', right: 'D', jump: 'SPACE', jump2: 'W', shoot: 'J', skill1: 'K', skill2: 'L' } // kiểu FPS: A D đi, Space nhảy (W cũng được), J bắn, K L skill
+      : { left: 'LEFT', right: 'RIGHT', jump: 'SPACE', jump2: 'UP', shoot: 'A', skill1: 'S', skill2: 'D' }; // kiểu mũi tên: Space nhảy (↑ cũng được), A bắn, S D skill
     this.keys = this.input.keyboard.addKeys(map); // tạo các phím theo bảng
     this.keyR = this.input.keyboard.addKey('R'); // phím R chơi lại
     this.keyEnter = this.input.keyboard.addKey('ENTER'); // phím Enter sang màn sau
@@ -416,7 +416,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       else if (this.keys.right.isDown || this.touch.right) { body.setVelocityX(220); this.facing = 1; } // đi phải
       else body.setVelocityX(0); // đứng yên
       if (this.pressed('jump') && onGround) { body.setVelocityY(-JUMP_V); this.jumpCut = true; this.jumpY0 = body.bottom; this.jumpT0 = time; this.sfx('jump', 0.3); this.jumpFx(); } // nhảy khi đang đứng đất (lực tối đa)
-      const jumpHeld = this.keys.jump.isDown || this.touch.jump; // còn giữ phím nhảy không
+      const jumpHeld = this.keys.jump.isDown || this.keys.jump2.isDown || this.touch.jump; // còn giữ phím nhảy không
       if (this.jumpCut && !jumpHeld && time - this.jumpT0 < JUMP_TAP_MS) { // thả phím ngay: nhảy thấp
         const left = JUMP_LOW - (this.jumpY0 - body.bottom); // độ cao còn thiếu để đạt mức thấp
         body.setVelocityY(left > 0 ? -Math.sqrt(2 * GRAVITY * left) : 0); // đặt lại lực để đỉnh nhảy đúng mức thấp
@@ -488,7 +488,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   }
 
   pressed(name) { // vừa bấm phím hoặc vừa chạm nút ảo trong khung này
-    return Phaser.Input.Keyboard.JustDown(this.keys[name]) || this.touch[name + 'Tap']; // bàn phím hoặc cảm ứng
+    return Phaser.Input.Keyboard.JustDown(this.keys[name]) || (this.keys[name + '2'] && Phaser.Input.Keyboard.JustDown(this.keys[name + '2'])) || this.touch[name + 'Tap']; // bàn phím hoặc cảm ứng
   }
 
   togglePause() { // tạm dừng hoặc chơi tiếp
@@ -1166,7 +1166,7 @@ class MenuScene extends Phaser.Scene { // màn tiêu đề: chọn điều khi�
     this.add.text(GAME_W / 2, 105, tr('Từ Verified tay trắng, leo từng role lên tới DCO', 'Start as Verified, climb every role up to DCO'), { fontFamily: FONT, fontSize: 16, color: '#aaaacc' }).setOrigin(0.5); // mô tả ngắn
     this.add.text(GAME_W / 2, 150, tr('Điều khiển (phím C để đổi)', 'Controls (press C to switch)'), { fontFamily: FONT, fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // tiêu đề chọn điều khiển
     const style = { fontFamily: FONT, fontSize: 16, color: '#ffffff', align: 'center', backgroundColor: '#12122a', padding: { x: 14, y: 10 } }; // kiểu nút
-    const schemeBtns = [['arrows', tr('Mũi tên\n← → đi  ↑ nhảy\nA bắn  S D skill', 'Arrow keys\n← → move  ↑ jump\nA shoot  S D skill')], ['wasd', tr('Kiểu FPS\nA D đi  W nhảy\nJ bắn  K L skill', 'FPS style\nA D move  W jump\nJ shoot  K L skill')]].map(([sc, label], i) => { // 2 nút điều khiển
+    const schemeBtns = [['arrows', tr('Mũi tên\n← → đi  Space nhảy\nA bắn  S D skill', 'Arrow keys\n← → move  Space jump\nA shoot  S D skill')], ['wasd', tr('Kiểu FPS\nA D đi  Space nhảy\nJ bắn  K L skill', 'FPS style\nA D move  Space jump\nJ shoot  K L skill')]].map(([sc, label], i) => { // 2 nút điều khiển
       const b = this.add.text(GAME_W / 2 + (i === 0 ? -150 : 150), 215, label, style).setOrigin(0.5).setInteractive({ useHandCursor: true }); // nút
       b.on('pointerdown', () => { playClick(this); setScheme(sc); }); // bấm thì chọn
       return [sc, b]; // lưu để tô màu

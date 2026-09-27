@@ -25,8 +25,11 @@ File này là kim chỉ nam khi build game. Đọc kèm `GAME_DESIGN.md` (thiế
 
 ## Điều khiển
 
-- PC: mũi tên trái/phải = đi, mũi tên lên = nhảy, A = bắn, S = skill 1, D = skill 2.
-- Mobile: nút ảo đi/nhảy bên trái, nút bắn + 2 nút skill bên phải.
+- PC, kiểu mũi tên: ← → đi, Space nhảy (↑ cũng được), A bắn, S skill 1, D skill 2.
+- PC, kiểu FPS: A D đi, Space nhảy (W cũng được), J bắn, K skill 1, L skill 2.
+- Chung: P tạm dừng (Esc cũng được), M về menu khi đang dừng. Chọn kiểu điều khiển ở menu (phím C).
+- Nhảy 2 mức: bấm nhanh nhảy thấp, giữ phím nhảy cao.
+- Mobile: bên trái ◀ ▶, bên phải nút bắn to + nút nhảy + 2 nút skill (có vòng hồi chiêu).
 
 ## Nguyên tắc lát cắt (RẤT QUAN TRỌNG)
 

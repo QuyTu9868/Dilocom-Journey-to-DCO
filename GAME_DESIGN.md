@@ -56,16 +56,22 @@ Mỗi màn: một chặng cuộn ngang, quái rải dọc đường, boss ở cu
 
 ## 5. Điều khiển
 
-### PC
-- Mũi tên trái/phải: đi
-- Mũi tên lên: nhảy
-- A: bắn thường
-- S: skill 1
-- D: skill 2
+### PC (chọn kiểu ở menu, phím C để đổi)
+| | Kiểu mũi tên | Kiểu FPS |
+|---|---|---|
+| Đi | ← → | A D |
+| Nhảy | Space (↑ cũng được) | Space (W cũng được) |
+| Bắn | A | J |
+| Skill 1 (5 tia) | S | K |
+| Skill 2 (lao tới) | D | L |
+| Tạm dừng | P (Esc cũng được) | P (Esc cũng được) |
+
+- Nhảy 2 mức: bấm nhanh nhảy thấp (khoảng 60% độ cao cũ), giữ phím nhảy cao (khoảng 120%). Không có thời gian chờ giữa 2 lần nhảy.
+- Khi tạm dừng: M về menu, chỉnh âm lượng nhạc và hiệu ứng.
 
 ### Mobile
-- Bên trái: nút ảo trái/phải + nút nhảy
-- Bên phải: nút bắn (A) + 2 nút skill (S, D)
+- Bên trái: nút ◀ ▶.
+- Bên phải: nút bắn to, nút nhảy ▲ cạnh nút bắn, 2 nút skill phía trên. Nút có vòng hồi chiêu kiểu MOBA.
 - Layout co giãn theo màn hình.
 
 ## 6. Quái (9 con, gom 4 kiểu hành vi)

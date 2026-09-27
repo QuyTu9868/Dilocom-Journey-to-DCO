@@ -15,7 +15,7 @@ const ARENA_X = 7600; // mép trái phòng boss
 const ROLES = { verified: { maxHp: 7 }, dliever: { maxHp: 10 }, dcoded: { maxHp: 15 } }; // máu tối đa theo role
 const LEVELS = { // dữ liệu từng màn
   1: { // màn 1 - xanh
-    neon: 0x3399ff, bgTint: 0x6699ff, color: 0x3399ff, tc: 'blue', bgFloor: 778, music: 'music_map_1', bossMusic: 'music_stage', startRole: 'verified', boss: 'dliever', bossHp: 30, // màu, nhạc, role đầu màn, boss
+    neon: 0x3399ff, bgTint: 0x6699ff, color: 0x3399ff, tc: 'blue', bgFloor: 778, music: 'music_map_1', bossMusic: 'music_stage', startRole: 'verified', boss: 'dliever', bossHp: 38, // màu, nhạc, role đầu màn, boss
     ground: [[0, 900], [1000, 1900], [2020, 2700], [2800, 3700], [3820, 4600], [4740, 5500], [5620, 6500], [6620, LEVEL_W]], // các đoạn sàn, khe giữa là hố
     platforms: [[560, 380, 160], [1180, 370, 140], [1380, 300, 140], [2180, 370, 180], [2950, 370, 160], [3400, 360, 140], [3880, 320, 150], [4100, 370, 180], [4900, 360, 140], [5100, 290, 140], [5900, 370, 180], [6900, 360, 160], [7200, 300, 140]], // bục nổi
     walls: [[1640, 80], [4350, 80], [6200, 100]], // tường (x, cao)
@@ -25,7 +25,7 @@ const LEVELS = { // dữ liệu từng màn
     enemies: [['bot_1_1', 'WALKER', 520], ['bot_1_2', 'FLYER', 1100], ['bot_1_1', 'WALKER', 1300], ['bot_1_3', 'CHARGER', 1850], ['bot_1_2', 'FLYER', 2300], ['bot_1_1', 'WALKER', 2550], ['bot_1_1', 'SHOOTER', 3030, 370], ['bot_1_3', 'CHARGER', 3300], ['bot_1_1', 'WALKER', 3900], ['bot_1_2', 'FLYER', 4200], ['bot_1_1', 'WALKER', 4900], ['bot_1_1', 'SHOOTER', 5170, 290], ['bot_1_3', 'CHARGER', 5400], ['bot_1_2', 'FLYER', 5800], ['bot_1_1', 'WALKER', 6000], ['bot_1_1', 'WALKER', 6800], ['bot_1_2', 'FLYER', 7000], ['bot_1_3', 'CHARGER', 7400]], // quái (tên, kiểu, x, mặt đứng)
   },
   2: { // màn 2 - vàng
-    neon: 0xffcc33, bgTint: 0xffcc77, color: 0xffcc33, tc: 'yellow', bgFloor: 798, music: 'music_map_2', bossMusic: 'music_level2', startRole: 'dliever', boss: 'dcoded', bossHp: 42, // màu, nhạc, role đầu màn, boss
+    neon: 0xffcc33, bgTint: 0xffcc77, color: 0xffcc33, tc: 'yellow', bgFloor: 798, music: 'music_map_2', bossMusic: 'music_level2', startRole: 'dliever', boss: 'dcoded', bossHp: 52, // màu, nhạc, role đầu màn, boss
     ground: [[0, 1000], [1120, 2000], [2150, 2900], [3050, 3800], [3950, 4700], [4850, 5600], [5750, 6500], [6650, LEVEL_W]], // các đoạn sàn
     platforms: [[500, 370, 160], [800, 300, 140], [1400, 360, 160], [1700, 290, 140], [2400, 370, 180], [3200, 360, 160], [3500, 290, 140], [4200, 370, 160], [4950, 360, 160], [5300, 290, 140], [6000, 370, 180], [6900, 360, 160], [7250, 300, 140]], // bục nổi
     walls: [[1750, 90], [4500, 90], [6300, 110]], // tường
@@ -35,7 +35,7 @@ const LEVELS = { // dữ liệu từng màn
     enemies: [['bot_2_1', 'WALKER', 600], ['bot_2_3', 'FLYER', 1000], ['bot_2_1', 'WALKER', 1500], ['bot_2_1', 'WALKER', 1560], ['bot_2_2', 'SHOOTER', 1760, 290], ['bot_2_3', 'FLYER', 2500], ['bot_2_1', 'WALKER', 3300], ['bot_2_1', 'WALKER', 3350], ['bot_2_2', 'SHOOTER', 3570, 290], ['bot_2_3', 'FLYER', 4000], ['bot_2_1', 'WALKER', 4300], ['bot_2_2', 'SHOOTER', 5030, 360], ['bot_2_1', 'WALKER', 5100], ['bot_2_3', 'FLYER', 5700], ['bot_2_1', 'WALKER', 6100], ['bot_2_1', 'WALKER', 6150], ['bot_2_1', 'WALKER', 6900], ['bot_2_3', 'FLYER', 7000], ['bot_2_2', 'SHOOTER', 7320, 300]], // quái màn 2
   },
   3: { // màn 3 - hồng, trùm cuối
-    neon: 0xff44cc, bgTint: 0xcc66ff, color: 0xff44cc, tc: 'pink', bgFloor: 796, music: 'music_map_3', bossMusic: 'music_level3', startRole: 'dcoded', boss: 'dco', bossHp: 60, // màu, nhạc, role đầu màn, boss
+    neon: 0xff44cc, bgTint: 0xcc66ff, color: 0xff44cc, tc: 'pink', bgFloor: 796, music: 'music_map_3', bossMusic: 'music_level3', startRole: 'dcoded', boss: 'dco', bossHp: 72, // màu, nhạc, role đầu màn, boss
     ground: [[0, 800], [930, 1800], [1950, 2600], [2760, 3600], [3760, 4500], [4660, 5400], [5560, 6400], [6560, LEVEL_W]], // các đoạn sàn
     platforms: [[450, 360, 150], [980, 300, 140], [1300, 360, 160], [1550, 290, 140], [2200, 360, 160], [3000, 370, 180], [3300, 300, 140], [4000, 360, 160], [4250, 290, 140], [4900, 370, 160], [5800, 360, 160], [6050, 290, 140], [6900, 360, 160], [7250, 300, 140]], // bục nổi
     walls: [[1550, 100], [3350, 90], [5200, 110], [6150, 100]], // tường
@@ -47,6 +47,11 @@ const LEVELS = { // dữ liệu từng màn
 };
 const PLAYER_FRAMES = ['idle_1', 'idle_2', 'run_1', 'run_2', 'run_3', 'run_4', 'jump_up', 'jump_down', 'shoot_1', 'shoot_2', 'hit_1', 'death_1', 'death_2']; // 13 khung nhân vật
 const ENEMY_FRAMES = ['move_1', 'move_2', 'jump_up', 'jump_down', 'attack_1', 'death_1', 'death_2']; // 7 khung quái
+const DIFF = { // độ khó từng màn: quái thường và boss
+  1: { eHp: -1, eBullet: 0.8, walkerCd: 5000, shooterCd: 3000, chargeV: 340, flyerCd: 2600, bossV: 235, bossRest: 150, dashV: 650 }, // màn 1: quái dễ hơn, boss mạnh hơn trước
+  2: { eHp: 1, eBullet: 1.15, walkerCd: 2800, shooterCd: 1900, chargeV: 460, flyerCd: 1300, bossV: 275, bossRest: 250, dashV: 740 }, // màn 2: khó hơn
+  3: { eHp: 1, eBullet: 1.3, walkerCd: 2300, shooterCd: 1600, chargeV: 500, flyerCd: 1000, bossV: 285, bossRest: 200, dashV: 800 }, // màn 3: khó nhất
+};
 const V2_SPEC = { idle: [4, 5.5], run: [8, 9], jump: [6, 0], shoot: [3, 9], hit: [2, 8], death: [4, 5] }; // bộ vẽ mới: [số khung, hình/giây]
 const V2 = { verified: { ...V2_SPEC, runshoot: [8, 9] }, dliever: { ...V2_SPEC, runshoot: [8, 9] }, dcoded: { ...V2_SPEC, runshoot: [8, 9] }, dco: { idle: [4, 5.5], run: [8, 9], runshoot: [8, 9], dash: [5, 9], shoot: [3, 8], hit: [2, 10], death: [4, 5] } }; // dco là boss: có run và dash, không có jump
 const FACES_LEFT = { dco: true }; // hình vẽ quay mặt sang trái (các nhân vật khác quay phải) // các role đã có bộ vẽ mới (kèm khung vừa chạy vừa bắn)
@@ -73,7 +78,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     for (let i = 1; i <= 3; i++) this.load.image(`stage_bg_${i}`, `assets/background/stage_bg_${i}.jpg`); // nạp ảnh nền riêng của 3 màn
     for (const n of ['shoot', 'fan', 'dash']) this.load.image(`icon_${n}`, `assets/ui/icon_${n}.png`); // nạp 3 icon nút bắn và skill
     for (const c of ['blue', 'yellow', 'pink']) for (const n of ['plat_l', 'plat_m', 'plat_r', 'wall', 'grid', 'gate_top', 'gate_mid', 'gate_bot', 'floor_m', 'floor_l', 'floor_r', 'pit_in']) this.load.image(`${c}_${n}`, `assets/terrain/${c}_${n}.png`); // nạp ảnh địa hình 3 màu
-    for (const a of ['shoot', 'hit', 'jump', 'skill', 'enemy_fall', 'beep', 'explode_small', 'boss_down', 'explode_big', 'role_up', 'pickup', 'checkpoint', 'win', 'lose']) this.load.audio(a, `assets/audio/${a}.ogg`); // nạp 14 hiệu ứng âm thanh
+    for (const a of ['shoot', 'hit', 'jump', 'skill', 'enemy_fall', 'beep', 'explode_small', 'boss_down', 'explode_big', 'role_up', 'pickup', 'checkpoint', 'win', 'lose', 'enemy_shoot', 'boss_shoot', 'warn', 'door', 'click']) this.load.audio(a, `assets/audio/${a}.ogg`); // nạp 14 hiệu ứng âm thanh
     for (let i = 1; i <= 3; i++) this.load.audio(`music_map_${i}`, [`assets/audio/music_map_${i}.ogg`, `assets/audio/music_map_${i}.mp3`]); // nhạc màn nhẹ nhàng (ogg, iPhone dùng mp3)
     this.load.audio('music_stage', 'assets/audio/music_stage.mp3'); // nhạc boss Dliever (dồn dập)
     this.load.audio('music_level2', 'assets/audio/music_level2.mp3'); // nhạc boss Dcoded
@@ -336,7 +341,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     box.body.setAllowGravity(!flying); // quái bay thì không trọng lực
     const spr = this.add.sprite(x, box.y, `${key}_move_1`).setOrigin(0.5, 1).setScale(scale).setDepth(9); // hình vẽ quái, cao bằng người chơi
     spr.play(`${key}_move`); // chạy animation di chuyển
-    const e = { key, type, box, spr, hp: big ? 7 : 3, state: 'alive', mode: 'idle', nextAt: this.time.now + 1500, baseY: box.y, color: this.lv.color }; // dữ liệu quái
+    const e = { key, type, box, spr, hp: (big ? 7 : 3) + DIFF[this.level].eHp, state: 'alive', mode: 'idle', nextAt: this.time.now + 1500, baseY: box.y, color: this.lv.color }; // dữ liệu quái
     box.enemy = e; // gắn ngược dữ liệu vào hitbox
     this.enemies.push(e); // lưu vào danh sách
     return e; // trả về quái
@@ -514,9 +519,9 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.makeSlider(215, tr('Nhạc', 'Music'), 'musicVol', (v) => { this.music.setVolume(0.35 * v); }); // thanh âm lượng nhạc
     this.makeSlider(280, tr('Hiệu ứng', 'Effects'), 'sfxVol', null); // thanh âm lượng hiệu ứng (thả tay thì phát thử)
     const resume = add(this.add.text(GAME_W / 2, 350, tr('▶ Chơi tiếp (P)', '▶ Resume (P)'), { fontFamily: FONT, fontSize: 22, color: '#ffffff', backgroundColor: '#2a4a8a', padding: { x: 16, y: 8 } }).setOrigin(0.5).setInteractive({ useHandCursor: true })); // nút chơi tiếp
-    resume.on('pointerdown', () => this.togglePause()); // bấm thì chơi tiếp
+    resume.on('pointerdown', () => { playClick(this); this.togglePause(); }); // bấm thì chơi tiếp
     const menu = add(this.add.text(GAME_W / 2, 400, tr('Về menu (M)', 'Menu (M)'), { fontFamily: FONT, fontSize: 16, color: '#aaaacc' }).setOrigin(0.5).setInteractive({ useHandCursor: true })); // nút về menu
-    menu.on('pointerdown', () => this.goMenu()); // bấm thì về menu
+    menu.on('pointerdown', () => { playClick(this); this.goMenu(); }); // bấm thì về menu
   }
 
   makeSlider(y, label, key, onChange) { // 1 thanh kéo âm lượng 0-100%
@@ -774,14 +779,14 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     if (e.mode !== 'charge') e.spr.setFlipX(dir < 0); // quay mặt về người chơi
     if (e.type === 'WALKER') { // quái đi bộ
       body.setVelocityX(near ? dir * 60 : 0); // tiến chậm về người chơi
-      if (near && time > e.nextAt) { e.nextAt = time + 3500; this.warnFlash(e, 300, () => this.enemyShoot(e, dir, 0)); } // thỉnh thoảng nháy rồi ném đạn
+      if (near && time > e.nextAt) { e.nextAt = time + DIFF[this.level].walkerCd; this.warnFlash(e, 300, () => this.enemyShoot(e, dir, 0)); } // thỉnh thoảng nháy rồi ném đạn
     } else if (e.type === 'SHOOTER') { // quái bắn đứng yên
       body.setVelocityX(0); // đứng tại chỗ
-      if (near && time > e.nextAt) { e.nextAt = time + 2200; this.warnFlash(e, 400, () => { this.enemyShoot(e, dir, 1); if (e.key === 'bot_2_2') this.enemyShoot(e, -dir, 0); }); } // nháy 0.4 giây rồi bắn nhắm người chơi
+      if (near && time > e.nextAt) { e.nextAt = time + DIFF[this.level].shooterCd; this.warnFlash(e, 400, () => { this.enemyShoot(e, dir, 1); if (e.key === 'bot_2_2') this.enemyShoot(e, -dir, 0); }); } // nháy 0.4 giây rồi bắn nhắm người chơi
     } else if (e.type === 'CHARGER') { // quái lao
       if (e.mode === 'idle') { body.setVelocityX(0); if (Math.abs(dx) < 360 && time > e.nextAt) { e.mode = 'warn'; e.chargeDir = dir; e.spr.anims.stop(); e.spr.setTexture(`${e.key}_attack_1`); this.tweens.add({ targets: e.spr, angle: 8, yoyo: true, repeat: 5, duration: 40, onComplete: () => e.spr.setAngle(0) }); this.time.delayedCall(500, () => { if (e.state === 'alive') { e.mode = 'charge'; e.modeUntil = this.time.now + 800; if (this.anims.exists(`${e.key}_charge`)) e.spr.play(`${e.key}_charge`); } }); } } // thấy người chơi thì khựng rung 0.5 giây
       else if (e.mode === 'warn') body.setVelocityX(0); // đứng yên lúc báo trước
-      else if (e.mode === 'charge') { body.setVelocityX(e.chargeDir * 420); if (time > e.modeUntil) { e.mode = 'idle'; e.nextAt = time + 1200; if (CHARGER_V2.includes(e.key)) { e.spr.anims.stop(); e.spr.setTexture(`${e.key}_recover_1`); this.time.delayedCall(300, () => { if (e.state === 'alive' && e.mode === 'idle') e.spr.play(`${e.key}_move`); }); } else e.spr.play(`${e.key}_move`); } } // lao thẳng 0.8 giây, khựng dừng một nhịp rồi đi tiếp
+      else if (e.mode === 'charge') { body.setVelocityX(e.chargeDir * DIFF[this.level].chargeV); if (time > e.modeUntil) { e.mode = 'idle'; e.nextAt = time + 1200; if (CHARGER_V2.includes(e.key)) { e.spr.anims.stop(); e.spr.setTexture(`${e.key}_recover_1`); this.time.delayedCall(300, () => { if (e.state === 'alive' && e.mode === 'idle') e.spr.play(`${e.key}_move`); }); } else e.spr.play(`${e.key}_move`); } } // lao thẳng 0.8 giây, khựng dừng một nhịp rồi đi tiếp
     } else if (e.type === 'FLYER') { // quái bay
       if (e.mode === 'idle') { // đang lượn
         body.setVelocityX(near ? dir * (e.key === 'bot_3_2' ? 160 : 90) : 0); // bay về phía người chơi (Deepfake bay nhanh)
@@ -789,7 +794,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
         if (Math.abs(dx) < 30 && time > e.nextAt) { e.mode = 'warn'; body.setVelocity(0, 0); this.warnFlash(e, 400, () => { e.mode = 'dive'; e.spr.setTexture(`${e.key}_jump_down`); e.modeUntil = this.time.now + 700; }); } // ở trên đầu thì chớp rồi bổ nhào
       } else if (e.mode === 'warn') body.setVelocity(0, 0); // khựng lúc báo trước
       else if (e.mode === 'dive') { body.setVelocity(0, e.key === 'bot_3_2' ? 560 : 420); if (time > e.modeUntil || e.box.y > GROUND_Y - 30) { e.mode = 'rise'; e.spr.setTexture(`${e.key}_jump_up`); } } // bổ nhào xuống
-      else if (e.mode === 'rise') { body.setVelocity(0, -220); if (e.box.y <= e.baseY) { e.mode = 'idle'; e.nextAt = time + 1500; e.spr.play(`${e.key}_move`); } } // bay lên lại độ cao cũ
+      else if (e.mode === 'rise') { body.setVelocity(0, -220); if (e.box.y <= e.baseY) { e.mode = 'idle'; e.nextAt = time + DIFF[this.level].flyerCd; e.spr.play(`${e.key}_move`); } } // bay lên lại độ cao cũ
     }
     if (e.box.y > GAME_H + 100) { e.state = 'gone'; e.box.destroy(); e.spr.destroy(); } // rơi hố thì biến mất
   }
@@ -804,7 +809,8 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     const b = this.eBullets.create(e.box.x, e.box.y - 10, 'bullet_spam').setScale(0.09 * BULLET_K).setTint(e.color); // tạo đạn tint màu màn
     b.body.setAllowGravity(false); // đạn bay thẳng
     const ang = aim ? Phaser.Math.Angle.Between(b.x, b.y, this.player.x, this.player.y) : (dir > 0 ? 0 : Math.PI); // có nhắm thì bắn về người chơi, không thì bắn ngang
-    b.setVelocity(Math.cos(ang) * 260, Math.sin(ang) * 260); // tốc độ đạn quái
+    b.setVelocity(Math.cos(ang) * 260 * DIFF[this.level].eBullet, Math.sin(ang) * 260 * DIFF[this.level].eBullet); // tốc độ đạn quái theo độ khó màn
+    this.sfx('enemy_shoot', 0.22); // tiếng quái bắn
     b.setFlipX(Math.cos(ang) < 0); // quay đạn theo hướng bay
     this.time.delayedCall(2500, () => b.destroy()); // đạn tự mất sau 2.5 giây
   }
@@ -864,7 +870,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.solids.add(this.add.rectangle(ARENA_X, 160, 20, GROUND_Y - 160).setOrigin(0)); // va chạm cửa đóng, không chạy ra được
     const door = this.drawGate(ARENA_X + 10, 160, GROUND_Y, false, true); // phần dưới cửa
     for (const o of door) o.y -= GROUND_Y - 160; // đặt sẵn phía trên, chuẩn bị sập xuống
-    this.tweens.add({ targets: door, y: `+=${GROUND_Y - 160}`, duration: 260, ease: 'Cubic.easeIn', onComplete: () => { this.cameras.main.shake(180, 0.01); this.sfx('explode_small', 0.5); } }); // cửa sập xuống, rung màn và kêu rầm
+    this.tweens.add({ targets: door, y: `+=${GROUND_Y - 160}`, duration: 260, ease: 'Cubic.easeIn', onComplete: () => { this.cameras.main.shake(180, 0.01); this.sfx('door', 0.7); } }); // cửa sập xuống, rung màn và kêu rầm
     this.respawnX = ARENA_X + 80; // rơi hố thì về đầu phòng boss
     const huge = this.lv.boss === 'dco'; // DCO to nhất
     const [bw, bh] = { dliever: [73, 87], dcoded: [74, 88], dco: [75, 106] }[this.lv.boss]; // hitbox khớp hình boss, nhỏ hơn hình một chút
@@ -918,8 +924,8 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       return; // xong lượt này
     }
     this.bossTelegraph(600, () => { // chớp xanh 0.6 giây báo trước
-      this.bossFan(0x66bbff, 200, 1); // bắn 5 tia xanh
-      if (rage) this.time.delayedCall(350, () => { if (b.state === 'alive') this.bossFan(0x66bbff, 200, 1); }); // dưới 50% bắn thêm loạt 2
+      this.bossFan(0x66bbff, DIFF[1].bossV, 1); // bắn 5 tia xanh
+      if (rage) this.time.delayedCall(350, () => { if (b.state === 'alive') this.bossFan(0x66bbff, DIFF[1].bossV, 1); }); // dưới 50% bắn thêm loạt 2
       this.time.delayedCall(rage ? 800 : 1000, () => this.bossWaitClear()); // chờ đạn bay hết rồi mới đánh tiếp
     });
   }
@@ -942,6 +948,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     b.dashing = true; // giữ hướng mặt trong lúc lấy đà và lao
     b.box.body.setVelocityX(-dir * 120); // lùi lấy đà
     const lineX = Math.min(b.box.x, endX), lineW = Math.abs(endX - b.box.x); // vùng vạch đỏ
+    this.sfx('warn', 0.5); // tiếng cảnh báo sắp lao
     const line = this.add.rectangle(lineX, GROUND_Y - 50, lineW, 40, 0xff2222, 0.35).setOrigin(0, 0.5).setDepth(8); // vạch đỏ chỉ đường lao
     this.tweens.add({ targets: line, alpha: 0.1, yoyo: true, repeat: 3, duration: 100 }); // vạch nhấp nháy
     this.time.delayedCall(b.fast ? 550 : 800, () => { // hết báo trước (DCO nổi điên thì báo ngắn hơn)
@@ -949,7 +956,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       if (b.state !== 'alive') return; // boss chết thì thôi
       b.spr.anims.timeScale = 1; // lao thì bước nhanh bình thường
       b.spr.play(this.anims.exists(`${b.key}_dash`) ? `${b.key}_dash` : `${b.key}_run`); // animation lao (DCO có khung dash riêng)
-      b.box.body.setVelocityX(dir * (b.fast ? 800 : 650)); // lao nhanh
+      b.box.body.setVelocityX(dir * (b.fast ? DIFF[this.level].dashV + 150 : DIFF[this.level].dashV)); // lao nhanh theo độ khó màn
       const ghostEv = this.time.addEvent({ delay: 40, loop: true, callback: () => { // để lại vệt vàng mờ
         const g = this.add.image(b.spr.x, b.spr.y, b.spr.texture.key).setOrigin(0.5, 1).setScale(b.spr.scale).setFlipX(b.spr.flipX).setTintFill(this.lv.color).setAlpha(0.5).setDepth(8); // bóng mờ boss
         this.tweens.add({ targets: g, alpha: 0, duration: 300, onComplete: () => g.destroy() }); // mờ dần
@@ -975,7 +982,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       this.bg.setTint(0xff3399); // nền ám hồng đậm
       this.tweens.add({ targets: this.bg, alpha: 0.55, yoyo: true, repeat: -1, duration: 280 }); // nền nhấp nháy hồng
     }
-    const speed = b.fast ? 300 : 240; // tốc độ đạn
+    const speed = b.fast ? DIFF[3].bossV + 60 : DIFF[3].bossV; // tốc độ đạn DCO
     const fanThenRest = () => { // bắn 5 tia rồi đợi đạn bay hết
       this.bossFan(0xff66cc, speed, 2); // 5 tia hồng, mỗi viên 2 sát thương
       this.time.delayedCall(800, () => this.bossWaitClear()); // đợi hết đạn rồi đánh tiếp
@@ -995,7 +1002,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
       const ang = dir + Phaser.Math.DegToRad(deg); // góc từng viên
       const bl = this.eBullets.create(b.box.x, b.box.y, 'bullet_boss').setScale(0.11 * BULLET_K).setTint(0xffcc33); // đạn vàng
       bl.body.setAllowGravity(false); // bay thẳng
-      bl.setVelocity(Math.cos(ang) * 240, Math.sin(ang) * 240); // tốc độ theo góc
+      bl.setVelocity(Math.cos(ang) * DIFF[2].bossV, Math.sin(ang) * DIFF[2].bossV); // tốc độ đạn vàng của Dcoded
       bl.setRotation(ang); // xoay theo hướng bay
       this.time.delayedCall(6000, () => bl.destroy()); // tự mất
     }
@@ -1005,7 +1012,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   bossWaitClear() { // đợi tới khi không còn đạn boss trên màn
     if (this.boss.state !== 'alive') return; // boss chết thì thôi
     if (this.eBullets.countActive(true) > 0) { this.time.delayedCall(200, () => this.bossWaitClear()); return; } // còn đạn thì kiểm tra lại sau 0.2 giây
-    this.time.delayedCall(400, () => this.bossNext()); // hết đạn thì nghỉ chút rồi đánh tiếp
+    this.time.delayedCall(DIFF[this.level].bossRest, () => this.bossNext()); // hết đạn thì nghỉ chút rồi đánh tiếp (màn khó nghỉ ít)
   }
 
   switchToBossMusic() { // nhạc màn nhỏ dần trong 0.8 giây rồi phát nhạc boss
@@ -1035,6 +1042,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   bossTelegraph(ms, then, color = 0x88ddff) { // boss chớp màu báo trước đòn
     const b = this.boss; // boss
     b.acting = true; // đang ra đòn: đứng yên, không đi bộ
+    this.sfx('warn', 0.45); // tiếng cảnh báo sắp ra đòn
     b.box.body.setVelocityX(0); // dừng lại để báo trước
     this.playAnim(b.spr, `${b.key}_idle`); // thôi bước, đứng lại
     this.time.addEvent({ delay: 100, repeat: Math.floor(ms / 100) - 1, callback: () => { if (b.state !== 'alive') return; if (b.spr.isTinted) b.spr.clearTint(); else b.spr.setTintFill(color); } }); // bật tắt chớp màu
@@ -1042,6 +1050,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   }
 
   bossFan(tint, speed, dmg) { // bắn 5 tia hình quạt về phía người chơi
+    this.sfx('boss_shoot', 0.45); // tiếng boss bắn
     const b = this.boss; // boss
     b.spr.anims.stop(); // dừng animation
     b.spr.setTexture(`${b.key}_shoot_2`); // tư thế bắn
@@ -1122,6 +1131,11 @@ function musicVol() { const v = game.registry.get('musicVol'); return v !== unde
 
 function sfxVol() { const v = game.registry.get('sfxVol'); return v !== undefined ? v : loadNum('sfxVol', 100) / 100; } // âm lượng hiệu ứng 0-1 (mặc định 100%)
 
+function playClick(scene) { // tiếng click khi bấm nút (theo cài đặt SFX)
+  const on = scene.registry.get('sfxOn') !== undefined ? scene.registry.get('sfxOn') : loadFlag('sfxOn'); // SFX đang bật không
+  if (on && scene.cache.audio.exists('click')) scene.sound.play('click', { volume: 0.5 * sfxVol() }); // phát tiếng click
+}
+
 function loadFlag(name) { // đọc cài đặt bật/tắt từ trình duyệt, mặc định bật
   try { return localStorage.getItem(name) !== '0'; } catch (e) { return true; } // lỗi bộ nhớ thì coi như bật
 }
@@ -1141,6 +1155,8 @@ function saveNum(name, v) { // lưu số vào trình duyệt
 class MenuScene extends Phaser.Scene { // màn tiêu đề: chọn điều khiển + chọn màn
   constructor() { super('Menu'); } // đặt tên cảnh là Menu
 
+  preload() { this.load.audio('click', 'assets/audio/click.ogg'); } // nạp tiếng click cho menu
+
   create() { // dựng menu
     this.sound.stopAll(); // tắt âm thanh còn sót
     let scheme = this.registry.get('scheme') || (loadNum('scheme', 1) === 2 ? 'wasd' : 'arrows'); // kiểu điều khiển đã lưu
@@ -1152,7 +1168,7 @@ class MenuScene extends Phaser.Scene { // màn tiêu đề: chọn điều khi�
     const style = { fontFamily: FONT, fontSize: 16, color: '#ffffff', align: 'center', backgroundColor: '#12122a', padding: { x: 14, y: 10 } }; // kiểu nút
     const schemeBtns = [['arrows', tr('Mũi tên\n← → đi  ↑ nhảy\nA bắn  S D skill', 'Arrow keys\n← → move  ↑ jump\nA shoot  S D skill')], ['wasd', tr('Kiểu FPS\nA D đi  W nhảy\nJ bắn  K L skill', 'FPS style\nA D move  W jump\nJ shoot  K L skill')]].map(([sc, label], i) => { // 2 nút điều khiển
       const b = this.add.text(GAME_W / 2 + (i === 0 ? -150 : 150), 215, label, style).setOrigin(0.5).setInteractive({ useHandCursor: true }); // nút
-      b.on('pointerdown', () => setScheme(sc)); // bấm thì chọn
+      b.on('pointerdown', () => { playClick(this); setScheme(sc); }); // bấm thì chọn
       return [sc, b]; // lưu để tô màu
     });
     const setScheme = (sc) => { // chọn kiểu điều khiển
@@ -1167,7 +1183,7 @@ class MenuScene extends Phaser.Scene { // màn tiêu đề: chọn điều khi�
     info.forEach(([name, boss, color], i) => { // vẽ 3 nút màn
       const open = i + 1 <= unlocked; // đã mở khóa chưa
       const b = this.add.text(GAME_W / 2 + (i - 1) * 220, 370, open ? `${name}\n${boss}` : `${name}\n${tr('KHÓA', 'LOCKED')}`, { ...style, fontSize: 20, color: open ? color : '#555566' }).setOrigin(0.5); // nút màn
-      if (open) { b.setInteractive({ useHandCursor: true }); b.on('pointerdown', () => this.startLevel(i + 1)); } // mở rồi thì bấm được
+      if (open) { b.setInteractive({ useHandCursor: true }); b.on('pointerdown', () => { playClick(this); this.startLevel(i + 1); }); } // mở rồi thì bấm được
     });
     if (unlocked > 1) this.add.text(GAME_W / 2, 425, tr(`Tiến độ đã lưu: mở tới màn ${unlocked}`, `Progress saved: stage ${unlocked} unlocked`), { fontFamily: FONT, fontSize: 14, color: '#88ff99' }).setOrigin(0.5); // báo có tiến độ lưu
     this.add.text(GAME_W / 2, 505, tr('Âm thanh: Kenney.nl (CC0), nhạc: Juhani Junkala (CC0)', 'SFX: Kenney.nl (CC0), music: Juhani Junkala (CC0)'), { fontFamily: FONT, fontSize: 13, color: '#666688' }).setOrigin(0.5); // credit âm thanh
@@ -1177,7 +1193,7 @@ class MenuScene extends Phaser.Scene { // màn tiêu đề: chọn điều khi�
     this.input.keyboard.on('keydown-C', () => setScheme(scheme === 'wasd' ? 'arrows' : 'wasd')); // phím C đổi điều khiển
     const langBtn = this.add.text(GAME_W - 16, 14, LANG === 'en' ? '[ EN ] / VI' : '[ VI ] / EN', { fontFamily: FONT, fontSize: 18, color: '#ffffff', backgroundColor: '#2a4a8a', padding: { x: 10, y: 6 } }).setOrigin(1, 0).setInteractive({ useHandCursor: true }); // nút đổi ngôn ngữ góc phải
     const toggleLang = () => { LANG = LANG === 'en' ? 'vi' : 'en'; try { localStorage.setItem('lang', LANG); } catch (e) { /* lỗi bộ nhớ thì bỏ qua */ } this.scene.restart(); }; // đổi ngôn ngữ, lưu lại, vẽ lại menu
-    langBtn.on('pointerdown', toggleLang); // bấm nút thì đổi
+    langBtn.on('pointerdown', () => { playClick(this); toggleLang(); }); // bấm nút thì đổi
     this.input.keyboard.on('keydown-L', toggleLang); // phím L đổi ngôn ngữ
     this.add.text(GAME_W - 16, 50, tr('Ngôn ngữ (L)', 'Language (L)'), { fontFamily: FONT, fontSize: 12, color: '#8888aa' }).setOrigin(1, 0); // chú thích dưới nút
   }

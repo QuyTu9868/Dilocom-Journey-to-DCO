@@ -15,7 +15,7 @@ const ARENA_X = 7600; // mép trái phòng boss
 const ROLES = { verified: { maxHp: 7 }, dliever: { maxHp: 10 }, dcoded: { maxHp: 15 } }; // máu tối đa theo role
 const LEVELS = { // dữ liệu từng màn
   1: { // màn 1 - xanh
-    neon: 0x3399ff, bgTint: 0x6699ff, color: 0x3399ff, tc: 'blue', bgFloor: 778, music: 'music_stage', startRole: 'verified', boss: 'dliever', bossHp: 30, // màu, nhạc, role đầu màn, boss
+    neon: 0x3399ff, bgTint: 0x6699ff, color: 0x3399ff, tc: 'blue', bgFloor: 778, music: 'music_map_1', bossMusic: 'music_stage', startRole: 'verified', boss: 'dliever', bossHp: 30, // màu, nhạc, role đầu màn, boss
     ground: [[0, 900], [1000, 1900], [2020, 2700], [2800, 3700], [3820, 4600], [4740, 5500], [5620, 6500], [6620, LEVEL_W]], // các đoạn sàn, khe giữa là hố
     platforms: [[560, 380, 160], [1180, 370, 140], [1380, 300, 140], [2180, 370, 180], [2950, 370, 160], [3400, 360, 140], [3880, 320, 150], [4100, 370, 180], [4900, 360, 140], [5100, 290, 140], [5900, 370, 180], [6900, 360, 160], [7200, 300, 140]], // bục nổi
     walls: [[1640, 80], [4350, 80], [6200, 100]], // tường (x, cao)
@@ -25,7 +25,7 @@ const LEVELS = { // dữ liệu từng màn
     enemies: [['bot_1_1', 'WALKER', 520], ['bot_1_2', 'FLYER', 1100], ['bot_1_1', 'WALKER', 1300], ['bot_1_3', 'CHARGER', 1850], ['bot_1_2', 'FLYER', 2300], ['bot_1_1', 'WALKER', 2550], ['bot_1_1', 'SHOOTER', 3030, 370], ['bot_1_3', 'CHARGER', 3300], ['bot_1_1', 'WALKER', 3900], ['bot_1_2', 'FLYER', 4200], ['bot_1_1', 'WALKER', 4900], ['bot_1_1', 'SHOOTER', 5170, 290], ['bot_1_3', 'CHARGER', 5400], ['bot_1_2', 'FLYER', 5800], ['bot_1_1', 'WALKER', 6000], ['bot_1_1', 'WALKER', 6800], ['bot_1_2', 'FLYER', 7000], ['bot_1_3', 'CHARGER', 7400]], // quái (tên, kiểu, x, mặt đứng)
   },
   2: { // màn 2 - vàng
-    neon: 0xffcc33, bgTint: 0xffcc77, color: 0xffcc33, tc: 'yellow', bgFloor: 798, music: 'music_level2', startRole: 'dliever', boss: 'dcoded', bossHp: 42, // màu, nhạc, role đầu màn, boss
+    neon: 0xffcc33, bgTint: 0xffcc77, color: 0xffcc33, tc: 'yellow', bgFloor: 798, music: 'music_map_2', bossMusic: 'music_level2', startRole: 'dliever', boss: 'dcoded', bossHp: 42, // màu, nhạc, role đầu màn, boss
     ground: [[0, 1000], [1120, 2000], [2150, 2900], [3050, 3800], [3950, 4700], [4850, 5600], [5750, 6500], [6650, LEVEL_W]], // các đoạn sàn
     platforms: [[500, 370, 160], [800, 300, 140], [1400, 360, 160], [1700, 290, 140], [2400, 370, 180], [3200, 360, 160], [3500, 290, 140], [4200, 370, 160], [4950, 360, 160], [5300, 290, 140], [6000, 370, 180], [6900, 360, 160], [7250, 300, 140]], // bục nổi
     walls: [[1750, 90], [4500, 90], [6300, 110]], // tường
@@ -35,7 +35,7 @@ const LEVELS = { // dữ liệu từng màn
     enemies: [['bot_2_1', 'WALKER', 600], ['bot_2_3', 'FLYER', 1000], ['bot_2_1', 'WALKER', 1500], ['bot_2_1', 'WALKER', 1560], ['bot_2_2', 'SHOOTER', 1760, 290], ['bot_2_3', 'FLYER', 2500], ['bot_2_1', 'WALKER', 3300], ['bot_2_1', 'WALKER', 3350], ['bot_2_2', 'SHOOTER', 3570, 290], ['bot_2_3', 'FLYER', 4000], ['bot_2_1', 'WALKER', 4300], ['bot_2_2', 'SHOOTER', 5030, 360], ['bot_2_1', 'WALKER', 5100], ['bot_2_3', 'FLYER', 5700], ['bot_2_1', 'WALKER', 6100], ['bot_2_1', 'WALKER', 6150], ['bot_2_1', 'WALKER', 6900], ['bot_2_3', 'FLYER', 7000], ['bot_2_2', 'SHOOTER', 7320, 300]], // quái màn 2
   },
   3: { // màn 3 - hồng, trùm cuối
-    neon: 0xff44cc, bgTint: 0xcc66ff, color: 0xff44cc, tc: 'pink', bgFloor: 796, music: 'music_level3', startRole: 'dcoded', boss: 'dco', bossHp: 60, // màu, nhạc, role đầu màn, boss
+    neon: 0xff44cc, bgTint: 0xcc66ff, color: 0xff44cc, tc: 'pink', bgFloor: 796, music: 'music_map_3', bossMusic: 'music_level3', startRole: 'dcoded', boss: 'dco', bossHp: 60, // màu, nhạc, role đầu màn, boss
     ground: [[0, 800], [930, 1800], [1950, 2600], [2760, 3600], [3760, 4500], [4660, 5400], [5560, 6400], [6560, LEVEL_W]], // các đoạn sàn
     platforms: [[450, 360, 150], [980, 300, 140], [1300, 360, 160], [1550, 290, 140], [2200, 360, 160], [3000, 370, 180], [3300, 300, 140], [4000, 360, 160], [4250, 290, 140], [4900, 370, 160], [5800, 360, 160], [6050, 290, 140], [6900, 360, 160], [7250, 300, 140]], // bục nổi
     walls: [[1550, 100], [3350, 90], [5200, 110], [6150, 100]], // tường
@@ -74,9 +74,10 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     for (const n of ['shoot', 'fan', 'dash']) this.load.image(`icon_${n}`, `assets/ui/icon_${n}.png`); // nạp 3 icon nút bắn và skill
     for (const c of ['blue', 'yellow', 'pink']) for (const n of ['plat_l', 'plat_m', 'plat_r', 'wall', 'grid', 'gate_top', 'gate_mid', 'gate_bot', 'floor_m', 'floor_l', 'floor_r', 'pit_in']) this.load.image(`${c}_${n}`, `assets/terrain/${c}_${n}.png`); // nạp ảnh địa hình 3 màu
     for (const a of ['shoot', 'hit', 'jump', 'skill', 'enemy_fall', 'beep', 'explode_small', 'boss_down', 'explode_big', 'role_up', 'pickup', 'checkpoint', 'win', 'lose']) this.load.audio(a, `assets/audio/${a}.ogg`); // nạp 14 hiệu ứng âm thanh
-    this.load.audio('music_stage', 'assets/audio/music_stage.mp3'); // nạp nhạc nền màn 1
-    this.load.audio('music_level2', 'assets/audio/music_level2.mp3'); // nạp nhạc nền màn 2
-    this.load.audio('music_level3', 'assets/audio/music_level3.mp3'); // nạp nhạc nền màn 3
+    for (let i = 1; i <= 3; i++) this.load.audio(`music_map_${i}`, [`assets/audio/music_map_${i}.ogg`, `assets/audio/music_map_${i}.mp3`]); // nhạc màn nhẹ nhàng (ogg, iPhone dùng mp3)
+    this.load.audio('music_stage', 'assets/audio/music_stage.mp3'); // nhạc boss Dliever (dồn dập)
+    this.load.audio('music_level2', 'assets/audio/music_level2.mp3'); // nhạc boss Dcoded
+    this.load.audio('music_level3', 'assets/audio/music_level3.mp3'); // nhạc boss DCO
     this.load.audio('music_win', 'assets/audio/music_win.mp3'); // nạp nhạc thắng
   }
 
@@ -856,6 +857,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   // ---------- BOSS DLIEVER ----------
 
   startBoss() { // vào phòng boss
+    this.switchToBossMusic(); // nhạc màn nhỏ dần, chuyển sang nhạc boss
     this.bossStarted = true; // đánh dấu đã vào
     this.cameras.main.stopFollow(); // ngừng bám nhân vật
     this.cameras.main.pan(ARENA_X + GAME_W / 2, GAME_H / 2, 600); // lia camera khoá phòng boss
@@ -1004,6 +1006,13 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     if (this.boss.state !== 'alive') return; // boss chết thì thôi
     if (this.eBullets.countActive(true) > 0) { this.time.delayedCall(200, () => this.bossWaitClear()); return; } // còn đạn thì kiểm tra lại sau 0.2 giây
     this.time.delayedCall(400, () => this.bossNext()); // hết đạn thì nghỉ chút rồi đánh tiếp
+  }
+
+  switchToBossMusic() { // nhạc màn nhỏ dần trong 0.8 giây rồi phát nhạc boss
+    const old = this.music; // nhạc màn đang phát
+    this.music = this.sound.add(this.lv.bossMusic, { loop: true, volume: 0.35 * musicVol() }); // nhạc boss lặp
+    if (old.isPlaying) this.tweens.add({ targets: old, volume: 0, duration: 800, onComplete: () => old.stop() }); else old.stop(); // nhạc màn tắt dần
+    if (this.registry.get('musicOn')) this.time.delayedCall(700, () => { if (!this.levelOver && !this.dead) this.music.play(); }); // nhạc boss vào khi nhạc màn gần tắt
   }
 
   bossFace(b, left) { // quay boss về trái hoặc phải, tính cả hình vẽ gốc quay hướng nào
@@ -1191,7 +1200,7 @@ class WinScene extends Phaser.Scene { // màn chiến thắng cuối game
     const spr = this.add.sprite(GAME_W / 2, 330, 'dco_idle_1').setOrigin(0.5, 1).setScale(0.9); // DCO đứng giữa màn
     spr.play('dco_idle'); // DCO thở
     this.add.particles(GAME_W / 2, 0, 'px', { x: { min: -480, max: 480 }, speedY: { min: 60, max: 160 }, lifespan: 4000, tint: [0xff44cc, 0x3399ff, 0xffcc33], frequency: 60 }); // mưa pháo giấy 3 màu
-    this.add.text(GAME_W / 2, 400, tr('Credit\nGame: làm cho Dlicom AI Game Jam\nSFX: Kenney.nl (CC0)\nNhạc: Juhani Junkala - 5 Action Chiptunes (CC0)', 'Credits\nGame: made for the Dlicom AI Game Jam\nSFX: Kenney.nl (CC0)\nMusic: Juhani Junkala - 5 Action Chiptunes (CC0)'), { fontFamily: FONT, fontSize: 15, color: '#aaaacc', align: 'center' }).setOrigin(0.5); // credit
+    this.add.text(GAME_W / 2, 400, tr('Credit\nGame: làm cho Dlicom AI Game Jam\nSFX: Kenney.nl (CC0)\nNhạc: Juhani Junkala - 5 Action Chiptunes, Chiptune Adventures (CC0)', 'Credits\nGame: made for the Dlicom AI Game Jam\nSFX: Kenney.nl (CC0)\nMusic: Juhani Junkala - 5 Action Chiptunes, Chiptune Adventures (CC0)'), { fontFamily: FONT, fontSize: 15, color: '#aaaacc', align: 'center' }).setOrigin(0.5); // credit
     this.add.text(GAME_W / 2, 505, tr('Enter / chạm: về menu', 'Enter / tap: back to menu'), { fontFamily: FONT, fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // hướng dẫn
     const back = () => { this.sound.stopAll(); this.scene.start('Menu'); }; // về menu
     this.input.keyboard.once('keydown-ENTER', back); // Enter về menu

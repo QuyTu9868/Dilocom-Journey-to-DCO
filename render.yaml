@@ -1,0 +1,11 @@
+# Cau hinh Render: trang web tinh, khong can build, phuc vu thang thu muc goc
+services:
+  - type: web
+    name: dlicom-journey-to-dco
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: .
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=300

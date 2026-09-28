@@ -1224,6 +1224,14 @@ class WinScene extends Phaser.Scene { // màn chiến thắng cuối game
   }
 }
 
+const TEXT_RES = Math.min(4, Math.max(1, Math.max(window.innerWidth / GAME_W, window.innerHeight / GAME_H) * (window.devicePixelRatio || 1))); // độ phân giải vẽ chữ = cỡ thật trên màn hình
+const origText = Phaser.GameObjects.GameObjectFactory.prototype.text; // hàm tạo chữ gốc của Phaser
+Phaser.GameObjects.GameObjectFactory.prototype.text = function (...args) { // mọi chữ tạo ra đều vẽ nét cao
+  const t = origText.apply(this, args); // tạo chữ như bình thường
+  t.setResolution(TEXT_RES); // vẽ chữ ở độ phân giải màn hình thật, không bị nhòe khi phóng to
+  t.texture.setFilter(Phaser.Textures.FilterMode.LINEAR); // làm mịn mép chữ (hình pixel vẫn giữ nét vuông)
+  return t; // trả về chữ
+};
 const fontsReady = document.fonts ? Promise.race([Promise.all(['16px "Chakra Petch"', '700 16px "Chakra Petch"', '16px "Bungee"'].map(f => document.fonts.load(f))), new Promise(r => setTimeout(r, 3000))]) : Promise.resolve(); // đợi phông tối đa 3 giây
 fontsReady.catch(() => {}).then(() => { window.game = new Phaser.Game({ // khởi tạo game sau khi có phông
   type: Phaser.AUTO, // tự chọn WebGL hoặc Canvas

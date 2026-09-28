@@ -77,6 +77,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     for (const i of ['item_health', 'item_spikes', 'item_checkpoint_off', 'item_checkpoint_on']) this.load.image(i, `assets/items/${i}.png`); // nạp vật phẩm
     for (let i = 1; i <= 3; i++) this.load.image(`stage_bg_${i}`, `assets/background/stage_bg_${i}.jpg`); // nạp ảnh nền riêng của 3 màn
     for (const n of ['shoot', 'fan', 'dash']) this.load.image(`icon_${n}`, `assets/ui/icon_${n}.png`); // nạp 3 icon nút bắn và skill
+    for (const r of ['dliever', 'dcoded', 'dco']) this.load.image(`badge_${r}`, `assets/ui/badge_${r}.png`); // nạp thẻ huy hiệu 3 role
     for (const c of ['blue', 'yellow', 'pink']) for (const n of ['plat_l', 'plat_m', 'plat_r', 'wall', 'grid', 'gate_top', 'gate_mid', 'gate_bot', 'floor_m', 'floor_l', 'floor_r', 'pit_in']) this.load.image(`${c}_${n}`, `assets/terrain/${c}_${n}.png`); // nạp ảnh địa hình 3 màu
     for (const a of ['shoot', 'hit', 'jump', 'skill', 'enemy_fall', 'beep', 'explode_small', 'boss_down', 'explode_big', 'role_up', 'pickup', 'checkpoint', 'win', 'lose', 'enemy_shoot', 'boss_shoot', 'warn', 'door', 'click']) this.load.audio(a, `assets/audio/${a}.ogg`); // nạp 14 hiệu ứng âm thanh
     for (let i = 1; i <= 3; i++) this.load.audio(`music_map_${i}`, [`assets/audio/music_map_${i}.ogg`, `assets/audio/music_map_${i}.mp3`]); // nhạc màn nhẹ nhàng (ogg, iPhone dùng mp3)
@@ -401,6 +402,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     const body = this.player.body; // body vật lý
     this.pSprite.x = this.player.x; // hình vẽ bám theo x
     this.pSprite.y = body.bottom; // chân hình vẽ đặt ở đáy hitbox
+    if (this.cutscene) { this.pSprite.y += this.riseY || 0; return; } // đang diễn cảnh lên role: không điều khiển, bay lên theo cảnh
     if (this.dead) return; // chết rồi thì không điều khiển
     if (this.player.y > GAME_H + 80) { this.fallInPit(); return; } // rơi xuống hố
     const onGround = body.blocked.down; // có đang đứng trên đất không
@@ -607,7 +609,8 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
   drawCd(c, time) { // vẽ hồi chiêu kiểu MOBA: quạt tối thu dần theo chiều kim đồng hồ + số giây
     const info = [[true, this.shootReadyAt, 333], [this.hasSkill1, this.skill1ReadyAt, 5000], [this.hasSkill2, this.skill2ReadyAt, 10000]][c.n]; // [đã mở, mốc hồi xong, tổng thời gian hồi]
     const [has, readyAt, total] = info; // tách dữ liệu
-    for (const p of c.parts) p.setAlpha(has ? 1 : 0.3); // chưa mở thì mờ
+    if (!has) { for (const p of c.parts) p.setVisible(false); c.g.clear(); c.txt.setText(''); return; } // chưa mở skill thì ẩn hẳn icon
+    if (!c.shown) { c.shown = true; for (const p of c.parts) { p.setVisible(true).setAlpha(0); this.tweens.add({ targets: p, alpha: 1, duration: 500 }); } } // vừa mở skill: icon hiện dần
     const left = has ? Math.max(0, readyAt - time) : 0; // thời gian hồi còn lại
     c.g.clear(); // xoá hình cũ
     if (left > 0) { // đang hồi chiêu
@@ -705,30 +708,90 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.tweens.add({ targets: g, alpha: 0, duration: 250, onComplete: () => g.destroy() }); // mờ dần rồi xoá
   }
 
-  captureRole(role, color, fromX, fromY) { // cảnh chiếm role: màu boss bay vào người chơi
-    for (let i = 0; i < 14; i++) { // 14 đốm màu
-      const orb = this.add.circle(fromX + Phaser.Math.Between(-40, 40), fromY + Phaser.Math.Between(-60, 20), 7, color).setDepth(60); // đốm màu tại xác boss
-      this.tweens.add({ targets: orb, x: this.player.x, y: this.player.y, scale: 0.3, delay: i * 70, duration: 700, ease: 'Cubic.easeIn', onComplete: () => orb.destroy() }); // bay dần vào người chơi
+  captureRole(role, color, fromX, fromY) { // cảnh lên role hoành tráng: tối màn, cột sáng, đốm xoáy, chớp đổi hình, vòng sóng, huy hiệu
+    const hex = '#' + color.toString(16).padStart(6, '0'); // màu role dạng chữ
+    const oldKey = this.pSprite.texture.key; // hình cũ để chớp xen kẽ
+    const newKey = `${role}_idle_1`; // hình mới
+    const px = this.player.x, foot = this.player.body.bottom; // vị trí người chơi
+    this.cutscene = true; this.riseY = 0; // bắt đầu cảnh, người chơi đứng yên
+    this.player.body.setVelocity(0, 0).setAllowGravity(false); // treo tại chỗ
+    this.pSprite.anims.stop(); this.pSprite.setAngle(0).setDepth(62); // dừng animation, đưa hình lên trên lớp tối
+    const fx = []; // các vật thể của cảnh để dọn sau
+    const skip = () => { this.time.timeScale = 4; this.tweens.timeScale = 4; }; // chạm hoặc bấm phím để tua nhanh
+    this.input.once('pointerdown', skip); this.input.keyboard.once('keydown', skip); // cho phép bỏ qua
+    // 1. làm tối màn
+    const dark = this.add.rectangle(0, 0, GAME_W, GAME_H, 0x000000, 0).setOrigin(0).setScrollFactor(0).setDepth(55); fx.push(dark); // lớp tối
+    this.tweens.add({ targets: dark, fillAlpha: 0.65, duration: 400 }); // tối dần
+    this.playRaw('warn', 0.5); // tiếng báo hiệu
+    // 2. cột sáng từ trời
+    const beam = this.add.rectangle(px, foot, 14, foot + 40, color, 0.55).setOrigin(0.5, 1).setDepth(58).setBlendMode(Phaser.BlendModes.ADD).setScale(0, 1); fx.push(beam); // cột sáng
+    const core = this.add.rectangle(px, foot, 4, foot + 40, 0xffffff, 0.8).setOrigin(0.5, 1).setDepth(59).setBlendMode(Phaser.BlendModes.ADD).setScale(0, 1); fx.push(core); // lõi sáng trắng
+    this.tweens.add({ targets: [beam, core], scaleX: { from: 0, to: 1 }, duration: 350, delay: 200, ease: 'Back.easeOut' }); // cột sáng giáng xuống
+    this.tweens.add({ targets: beam, scaleX: 6, alpha: 0.35, duration: 1600, delay: 550 }); // cột sáng nở rộng
+    // 3. nhân vật bay lên, lắc nhẹ
+    this.tweens.add({ targets: this, riseY: -46, duration: 900, delay: 300, ease: 'Sine.easeOut' }); // bay lên nửa người
+    this.tweens.add({ targets: this.pSprite, angle: { from: -6, to: 6 }, yoyo: true, repeat: 3, duration: 220, delay: 400 }); // lắc lư lơ lửng
+    // 4. đốm sáng xoáy ốc từ xác boss vào người
+    for (let i = 0; i < 22; i++) { // 22 đốm
+      const orb = this.add.circle(fromX, fromY, 6, i % 3 ? color : 0xffffff).setDepth(61).setBlendMode(Phaser.BlendModes.ADD); fx.push(orb); // đốm sáng
+      const a0 = (i / 22) * Math.PI * 2, r0 = 90 + (i % 4) * 15; // góc và bán kính xuất phát
+      const st = { t: 0 }; // tiến độ bay 0-1
+      this.tweens.add({ targets: st, t: 1, duration: 1300, delay: 400 + i * 35, ease: 'Sine.easeIn', // bay xoắn ốc
+        onUpdate: () => { const cx = Phaser.Math.Linear(fromX, px, Math.min(1, st.t * 1.6)), cy = Phaser.Math.Linear(fromY, foot - 30 - 46, Math.min(1, st.t * 1.6)); const a = a0 + st.t * Math.PI * 5, r = r0 * (1 - st.t); orb.setPosition(cx + Math.cos(a) * r, cy + Math.sin(a) * r * 0.6).setScale(1 - st.t * 0.6); }, // tâm dời dần về người, bán kính thu nhỏ
+        onComplete: () => orb.setVisible(false) }); // nhập vào người
     }
-    this.time.delayedCall(14 * 70 + 700, () => { // khi đốm cuối chạm người
-      this.role = role; // đổi role (đổi bộ sprite theo màu mới)
-      this.maxHp = ROLES[role].maxHp; // máu tối đa theo role mới
-      this.hp = this.maxHp; // hồi đầy máu
-      this.hasSkill1 = true; // có skill 5 tia
-      if (role === 'dcoded') this.hasSkill2 = true; // Dcoded mở thêm skill lao
-      this.canNext = true; // cho phép sang màn sau
+    for (let i = 0; i < 8; i++) this.time.delayedCall(500 + i * 170, () => this.playRaw('beep', 0.25, i * 150)); // tiếng ngân dâng cao dần
+    // 6. chớp đổi hình cũ/mới nhanh dần
+    let t = 1700; const gaps = [180, 150, 120, 95, 75, 60, 50, 40]; // khoảng chớp ngắn dần
+    gaps.forEach((g, i) => { t += g; this.time.delayedCall(t, () => this.pSprite.setTexture(i % 2 ? oldKey : newKey).setTintFill(i % 2 ? 0xffffff : color)); }); // xen kẽ hình cũ và mới
+    // 5. khoảnh khắc đổi role: vòng sóng, nổ hạt, rung
+    this.time.delayedCall(t + 60, () => {
+      this.role = role; // đổi role
+      this.maxHp = ROLES[role].maxHp; this.hp = this.maxHp; // máu mới, hồi đầy
+      this.hasSkill1 = true; if (role === 'dcoded') this.hasSkill2 = true; // mở skill
       this.registry.set('cpX', null); // qua màn thì bỏ checkpoint
       saveNum('unlocked', Math.max(loadNum('unlocked', 1), this.level + 1)); // lưu tiến độ: mở khóa màn sau
       saveNum('role_' + (this.level + 1), 1); // đánh dấu đã có role mới
-      this.sfx('role_up', 0.7); // âm lên role
-      this.pSprite.setTintFill(0xffffff); // chớp trắng lúc lột xác
-      this.time.delayedCall(150, () => this.pSprite.clearTint()); // tắt chớp
-      this.explode(this.player.x, this.player.y, color, 30); // bùng hạt màu quanh người
+      this.pSprite.setTexture(newKey).clearTint(); this.pSprite.play(`${role}_idle`); // hình mới
+      this.cameras.main.flash(250, 255, 255, 255); this.cameras.main.shake(350, 0.012); // chớp trắng, rung màn
+      this.playRaw('explode_big', 0.5); this.playRaw('role_up', 0.8); // tiếng bùm và lên role
+      const cy = foot - 30 + this.riseY; // tâm người đang lơ lửng
+      for (let k = 0; k < 3; k++) { const ring = this.add.circle(px, cy, 20, color, 0).setStrokeStyle(5, k ? color : 0xffffff).setDepth(60).setBlendMode(Phaser.BlendModes.ADD); fx.push(ring); this.tweens.add({ targets: ring, scale: 9 + k * 3, alpha: 0, duration: 800, delay: k * 130, ease: 'Cubic.easeOut' }); } // 3 vòng sóng tỏa ra
+      this.explode(px, cy, color, 60); this.explode(px, cy, 0xffffff, 25); // hạt sáng bắn tung
+      // 7. huy hiệu và tên role
+      const badge = this.textures.exists(`badge_${role}`) ? this.add.image(GAME_W / 2, -170, `badge_${role}`).setScrollFactor(0).setDepth(70).setScale(0.55) : null; // thẻ huy hiệu
+      if (badge) { fx.push(badge); this.tweens.add({ targets: badge, y: 175, duration: 550, ease: 'Back.easeOut' }); } // thả xuống
+      const title = this.add.text(GAME_W / 2, 338, role.toUpperCase(), { fontFamily: FONT_TITLE, fontSize: 44, color: hex, stroke: '#000', strokeThickness: 7 }).setOrigin(0.5).setScrollFactor(0).setDepth(70).setPadding(24).setShadow(0, 0, hex, 20, true, true).setScale(2.4).setAlpha(0); fx.push(title); // tên role
+      this.tweens.add({ targets: title, scale: 1, alpha: 1, duration: 400, delay: 200, ease: 'Back.easeOut' }); // chữ đập xuống
       const wasd = this.scheme === 'wasd'; // kiểu điều khiển
-      const skill = role === 'dliever' ? tr(`5 tia (phím ${wasd ? 'K' : 'S'})`, `5-way shot (key ${wasd ? 'K' : 'S'})`) : tr(`lao tới (phím ${wasd ? 'L' : 'D'})`, `dash (key ${wasd ? 'L' : 'D'})`); // tên skill vừa mở
-      const next = LEVELS[this.level + 1] ? tr('Enter / chạm: sang màn sau   R: chơi lại', 'Enter / tap: next stage   R: replay') : tr('R: chơi lại', 'R: replay'); // hướng dẫn tiếp
-      this.showCenterText(`${role.toUpperCase()}!\n${tr('Mở khóa skill', 'Skill unlocked')}: ${skill}\n${next}`, '#' + color.toString(16).padStart(6, '0'), () => this.nextLevel()); // chữ role mới, chạm để sang màn sau
+      const [icon, sk] = role === 'dliever' ? ['fan', tr(`5 TIA  [${wasd ? 'K' : 'S'}]`, `5-WAY SHOT  [${wasd ? 'K' : 'S'}]`)] : ['dash', tr(`LAO TỚI  [${wasd ? 'L' : 'D'}]`, `DASH  [${wasd ? 'L' : 'D'}]`)]; // skill vừa mở
+      const ico = this.add.image(GAME_W + 80, 400, `icon_${icon}`).setDisplaySize(52, 52).setScrollFactor(0).setDepth(70); fx.push(ico); // icon skill
+      const lab = this.add.text(GAME_W + 120, 400, `${tr('SKILL MỚI', 'NEW SKILL')}: ${sk}`, { fontFamily: FONT, fontSize: 22, color: '#ffffff', stroke: '#000', strokeThickness: 5 }).setOrigin(0, 0.5).setScrollFactor(0).setDepth(70); fx.push(lab); // chữ skill mới
+      const w = 60 + lab.width; // bề ngang cụm icon + chữ
+      this.tweens.add({ targets: ico, x: GAME_W / 2 - w / 2 + 26, duration: 450, delay: 450, ease: 'Cubic.easeOut' }); // icon trượt vào
+      this.tweens.add({ targets: lab, x: GAME_W / 2 - w / 2 + 64, duration: 450, delay: 450, ease: 'Cubic.easeOut' }); // chữ trượt vào
     });
+    // kết thúc: hạ xuống, dọn cảnh, hiện hướng dẫn sang màn
+    this.time.delayedCall(t + 2300, () => {
+      this.tweens.add({ targets: this, riseY: 0, duration: 400, ease: 'Sine.easeIn' }); // hạ xuống đất
+      this.tweens.add({ targets: [dark, beam, core], alpha: 0, duration: 500 }); // tắt lớp tối và cột sáng
+    });
+    this.time.delayedCall(t + 2800, () => {
+      this.time.timeScale = 1; this.tweens.timeScale = 1; // trả tốc độ thường
+      this.input.off('pointerdown', skip); this.input.keyboard.off('keydown', skip); // bỏ bắt phím tua
+      this.cutscene = false; this.player.body.setAllowGravity(true); this.pSprite.setDepth(10); // trả người chơi về bình thường
+      for (const o of [dark, beam, core]) o.destroy(); // dọn lớp tối và cột sáng (huy hiệu, chữ giữ lại)
+      this.canNext = true; // cho phép sang màn sau
+      const next = LEVELS[this.level + 1] ? tr('Enter / chạm: sang màn sau   R: chơi lại', 'Enter / tap: next stage   R: replay') : tr('R: chơi lại', 'R: replay'); // hướng dẫn tiếp
+      const hint = this.add.text(GAME_W / 2, 470, next, { fontFamily: FONT, fontSize: 20, color: '#ffffff', stroke: '#000', strokeThickness: 5 }).setOrigin(0.5).setScrollFactor(0).setDepth(70).setInteractive({ useHandCursor: true }); // chữ hướng dẫn
+      hint.on('pointerdown', () => this.nextLevel()); // chạm để sang màn sau
+      this.tweens.add({ targets: hint, alpha: 0.4, yoyo: true, repeat: -1, duration: 600 }); // nhấp nháy mời bấm
+      this.time.delayedCall(300, () => this.input.once('pointerdown', () => { if (this.canNext) this.nextLevel(); })); // chạm bất kỳ đâu cũng sang màn
+    });
+  }
+
+  playRaw(key, volume, detune = 0) { // phát âm thanh có chỉnh cao độ (theo cài đặt SFX)
+    if (this.registry.get('sfxOn')) this.sound.play(key, { volume: volume * sfxVol(), detune }); // phát
   }
 
   damagePlayer(amount, fromX) { // nhân vật trúng đòn

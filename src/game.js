@@ -1278,6 +1278,15 @@ class WinScene extends Phaser.Scene { // màn chiến thắng cuối game
     this.add.text(GAME_W / 2, 115, 'Verified → Dliever → Dcoded → DCO', { fontFamily: FONT, fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // hành trình
     const spr = this.add.sprite(GAME_W / 2, 330, 'dco_idle_1').setOrigin(0.5, 1).setScale(0.9); // DCO đứng giữa màn
     spr.play('dco_idle'); // DCO thở
+    if (this.textures.exists('badge_dco')) { // thẻ huy hiệu DCO hai bên
+      for (const x of [215, GAME_W - 215]) { // bên trái và bên phải
+        const glow = this.add.circle(x, 250, 95, 0xff44cc, 0.25).setBlendMode(Phaser.BlendModes.ADD); // quầng sáng sau thẻ
+        this.tweens.add({ targets: glow, scale: 1.25, alpha: 0.1, yoyo: true, repeat: -1, duration: 900 }); // quầng nhịp thở
+        const badge = this.add.image(x, -200, 'badge_dco').setScale(0.4); // thẻ DCO
+        this.tweens.add({ targets: badge, y: 250, duration: 700, delay: 600, ease: 'Back.easeOut' }); // thả xuống
+        this.tweens.add({ targets: badge, angle: { from: -3, to: 3 }, yoyo: true, repeat: -1, duration: 1400, delay: 1300 }); // đung đưa nhẹ
+      }
+    }
     this.add.particles(GAME_W / 2, 0, 'px', { x: { min: -480, max: 480 }, speedY: { min: 60, max: 160 }, lifespan: 4000, tint: [0xff44cc, 0x3399ff, 0xffcc33], frequency: 60 }); // mưa pháo giấy 3 màu
     this.add.text(GAME_W / 2, 400, tr('Credit\nGame: làm cho Dlicom AI Game Jam\nSFX: Kenney.nl (CC0)\nNhạc: Juhani Junkala - 5 Action Chiptunes, Chiptune Adventures (CC0)', 'Credits\nGame: made for the Dlicom AI Game Jam\nSFX: Kenney.nl (CC0)\nMusic: Juhani Junkala - 5 Action Chiptunes, Chiptune Adventures (CC0)'), { fontFamily: FONT, fontSize: 15, color: '#aaaacc', align: 'center' }).setOrigin(0.5); // credit
     this.add.text(GAME_W / 2, 505, tr('Enter / chạm: về menu', 'Enter / tap: back to menu'), { fontFamily: FONT, fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // hướng dẫn

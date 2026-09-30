@@ -9,10 +9,43 @@
   <style>
     html, body { margin: 0; height: 100%; background: #05050c; overflow: hidden; } /* nền tối, không cuộn trang */
     #game { width: 100%; height: 100%; } /* khung chứa game chiếm hết màn hình */
+    .gate { position: fixed; inset: 0; z-index: 10; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 18px; background: #05050c; color: #fff; font-family: "Chakra Petch", sans-serif; text-align: center; padding: 16px; } /* lớp che toàn màn hình */
+    .gate.show { display: flex; } /* hiện lớp che */
+    .gate h1 { font-family: "Bungee", sans-serif; color: #88ccff; font-size: clamp(16px, 6vw, 30px); margin: 0; text-shadow: 0 0 14px #3399ff; } /* tên game */
+    #playBtn { font-family: "Bungee", sans-serif; font-size: 28px; color: #fff; background: #2a4a8a; border: 3px solid #3399ff; border-radius: 16px; padding: 18px 42px; box-shadow: 0 0 24px #3399ff; } /* nút chơi */
+    .phone { font-size: 56px; animation: spin 1.6s ease-in-out infinite; } /* biểu tượng điện thoại xoay */
+    @keyframes spin { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(90deg); } } /* xoay từ dọc sang ngang */
   </style>
 </head>
 <body>
   <div id="game"></div> <!-- nơi Phaser vẽ game -->
+  <div class="gate" id="startGate"> <!-- màn bắt đầu trên điện thoại: phải bấm nút mới chơi được -->
+    <h1>DLICOM:<br>JOURNEY TO DCO</h1> <!-- tên game -->
+    <button id="playBtn">▶ CHƠI</button> <!-- nút chơi: bật toàn màn hình và khóa ngang -->
+  </div>
+  <div class="gate" id="rotateGate"> <!-- lời nhắc xoay ngang (máy không tự xoay được, vd iPhone) -->
+    <div class="phone">📱</div> <!-- điện thoại xoay -->
+    <div>Xoay ngang điện thoại để chơi<br>Rotate your phone to landscape</div> <!-- chữ nhắc 2 thứ tiếng -->
+  </div>
+  <script>
+    const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0; // có phải máy cảm ứng không
+    const startGate = document.getElementById('startGate'), rotateGate = document.getElementById('rotateGate'); // 2 lớp che
+    let started = false; // đã bấm nút chơi chưa
+    const portrait = () => window.innerHeight > window.innerWidth; // đang cầm dọc không
+    const refresh = () => { // cập nhật lớp che theo trạng thái
+      startGate.classList.toggle('show', isTouch && !started); // chưa bấm chơi thì che bằng nút chơi
+      rotateGate.classList.toggle('show', isTouch && started && portrait()); // đã bấm mà vẫn dọc thì nhắc xoay
+    };
+    document.getElementById('playBtn').addEventListener('click', async () => { // bấm nút chơi
+      started = true; // đánh dấu đã bắt đầu
+      try { await document.documentElement.requestFullscreen({ navigationUI: 'hide' }); } catch (e) { /* máy không hỗ trợ toàn màn hình thì bỏ qua */ } // vào toàn màn hình
+      try { await screen.orientation.lock('landscape'); } catch (e) { /* máy không cho khóa hướng (iPhone) thì dùng lời nhắc xoay */ } // khóa màn hình ngang, bỏ qua khóa xoay của máy
+      refresh(); // cập nhật lớp che
+    });
+    document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && isTouch) { started = false; } refresh(); }); // thoát toàn màn hình thì hiện lại nút chơi
+    window.addEventListener('resize', refresh); // xoay máy thì cập nhật
+    refresh(); // hiện lần đầu
+  </script>
   <script src="lib/phaser.min.js"></script> <!-- nạp thư viện Phaser 3 lưu sẵn -->
   <script src="src/game.js"></script> <!-- nạp code game -->
 </body>

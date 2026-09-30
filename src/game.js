@@ -1,6 +1,7 @@
 // Dlicom: Journey to DCO - 3 màn, 3 boss, 4 dạng nhân vật
 
-const GAME_W = 960; // chiều rộng khung hình
+let GAME_W = 960; // chiều rộng khung hình (tự nới theo tỉ lệ màn hình lúc khởi động, chiều cao giữ 540)
+const ARENA_W = 960; // độ rộng phòng boss, cố định để độ khó không đổi
 const GAME_H = 540; // chiều cao khung hình
 const GROUND_Y = 480; // mặt trên của sàn chính
 const GRAVITY = 1400; // trọng lực
@@ -274,8 +275,8 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     for (const [x, h] of lv.walls) this.addWall(x, h); // tường dùng ảnh
     this.solids.add(this.add.rectangle(ARENA_X, 0, 20, 160).setOrigin(0)); // va chạm phần trên cửa phòng boss
     this.drawGate(ARENA_X + 10, 0, 160, true, false); // hình phần trên cửa, treo sẵn chờ sập
-    this.solids.add(this.add.rectangle(ARENA_X + GAME_W - 20, 0, 40, GROUND_Y).setOrigin(0)); // tường mép phải phòng boss, không lao hay đi ra khỏi màn
-    this.drawGate(ARENA_X + GAME_W - 10, 0, GROUND_Y, true, true); // hình cổng luôn đóng ở mép phải
+    this.solids.add(this.add.rectangle(ARENA_X + ARENA_W - 20, 0, 40, GROUND_Y).setOrigin(0)); // tường mép phải phòng boss, không lao hay đi ra khỏi màn
+    this.drawGate(ARENA_X + ARENA_W - 10, 0, GROUND_Y, true, true); // hình cổng luôn đóng ở mép phải
     for (const x of lv.spikes) this.addSpikes(x); // gai
     for (const [x, y] of lv.health) this.addHealth(x, y); // cục máu đặt sẵn
     this.cps = this.physics.add.staticGroup(); // nhóm cột hồi sinh
@@ -639,10 +640,10 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     };
     mk(75, 460, 46, 'left', '◀'); // trái: đi trái
     mk(190, 460, 46, 'right', '▶'); // trái: đi phải
-    mk(860, 440, 56, 'shoot', '', 'shoot', 0); // phải: nút bắn to
-    mk(735, 470, 46, 'jump', '▲'); // phải: nút nhảy cạnh nút bắn
-    mk(760, 345, 38, 'skill1', '', 'fan', 1); // phải: skill 5 tia
-    mk(880, 310, 38, 'skill2', '', 'dash', 2); // phải: skill lao
+    mk(GAME_W - 100, 440, 56, 'shoot', '', 'shoot', 0); // phải: nút bắn to
+    mk(GAME_W - 225, 470, 46, 'jump', '▲'); // phải: nút nhảy cạnh nút bắn
+    mk(GAME_W - 200, 345, 38, 'skill1', '', 'fan', 1); // phải: skill 5 tia
+    mk(GAME_W - 80, 310, 38, 'skill2', '', 'dash', 2); // phải: skill lao
   }
 
   swapRunAnim(key) { // đổi qua lại giữa chạy và chạy bắn, giữ đúng bước chân đang chạy
@@ -929,7 +930,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     this.switchToBossMusic(); // nhạc màn nhỏ dần, chuyển sang nhạc boss
     this.bossStarted = true; // đánh dấu đã vào
     this.cameras.main.stopFollow(); // ngừng bám nhân vật
-    this.cameras.main.pan(ARENA_X + GAME_W / 2, GAME_H / 2, 600); // lia camera khoá phòng boss
+    this.cameras.main.pan(ARENA_X + ARENA_W / 2, GAME_H / 2, 600); // lia camera khoá phòng boss
     this.solids.add(this.add.rectangle(ARENA_X, 160, 20, GROUND_Y - 160).setOrigin(0)); // va chạm cửa đóng, không chạy ra được
     const door = this.drawGate(ARENA_X + 10, 160, GROUND_Y, false, true); // phần dưới cửa
     for (const o of door) o.y -= GROUND_Y - 160; // đặt sẵn phía trên, chuẩn bị sập xuống
@@ -976,8 +977,8 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     if (b.key === 'dcoded') { this.dcodedNext(rage); return; } // boss màn 2 có bộ đòn riêng
     if (b.key === 'dco') { this.dcoNext(rage); return; } // trùm cuối có bộ đòn riêng
     if (b.step % 3 === 0) { // cứ đòn thứ 3 thì nhảy đổi phía
-      const left = ARENA_X + 120, right = ARENA_X + GAME_W - 120; // 2 vị trí đứng trong phòng
-      const target = b.box.x < ARENA_X + GAME_W / 2 ? right : left; // nhảy sang phía đối diện
+      const left = ARENA_X + 120, right = ARENA_X + ARENA_W - 120; // 2 vị trí đứng trong phòng
+      const target = b.box.x < ARENA_X + ARENA_W / 2 ? right : left; // nhảy sang phía đối diện
       b.jumping = true; // đánh dấu đang nhảy
       b.jumpAt = this.time.now; // mốc bật nhảy
       b.spr.anims.stop(); // dừng animation
@@ -1006,7 +1007,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     const b = this.boss; // boss
     if (b.state !== 'alive' || this.dead) return; // hết trận thì thôi
     const dir = this.player.x < b.box.x ? -1 : 1; // lao về phía người chơi
-    const endX = dir > 0 ? ARENA_X + GAME_W - 60 : ARENA_X + 60; // điểm dừng ở mép phòng
+    const endX = dir > 0 ? ARENA_X + ARENA_W - 60 : ARENA_X + 60; // điểm dừng ở mép phòng
     this.bossFace(b, dir < 0); // quay mặt về hướng lao
     b.dashing = true; // giữ hướng mặt trong lúc lấy đà và lao
     b.box.body.setVelocityX(-dir * 120); // lùi lấy đà
@@ -1095,7 +1096,7 @@ class GameScene extends Phaser.Scene { // cảnh chơi chính
     if (b.key === 'dliever') v = dist < 300 ? -dir * 90 : dist > 520 ? dir * 70 : 0; // Dliever bắn xa: giữ khoảng cách 300-520
     else if (dist > 110) v = dir * (b.key === 'dco' ? (b.fast ? 130 : 80) : 90); // Dcoded, DCO: áp sát người chơi, DCO nổi điên đi nhanh hơn
     const nx = b.box.x + v * 0.15; // vị trí sắp tới
-    if (nx < ARENA_X + 70 || nx > ARENA_X + GAME_W - 70) v = 0; // không ra khỏi phòng boss
+    if (nx < ARENA_X + 70 || nx > ARENA_X + ARENA_W - 70) v = 0; // không ra khỏi phòng boss
     b.box.body.setVelocityX(v); // đi
     b.spr.anims.timeScale = v !== 0 ? 0.7 : 1; // boss đi bộ chậm nên bước chậm lại
     if (v !== 0) this.playAnim(b.spr, this.anims.exists(`${b.key}_run`) ? `${b.key}_run` : `${b.key}_runshoot`); // đang đi thì chạy animation bước (DCO dùng khung chạy bắn)
@@ -1287,7 +1288,7 @@ class WinScene extends Phaser.Scene { // màn chiến thắng cuối game
         this.tweens.add({ targets: badge, angle: { from: -3, to: 3 }, yoyo: true, repeat: -1, duration: 1400, delay: 1300 }); // đung đưa nhẹ
       }
     }
-    this.add.particles(GAME_W / 2, 0, 'px', { x: { min: -480, max: 480 }, speedY: { min: 60, max: 160 }, lifespan: 4000, tint: [0xff44cc, 0x3399ff, 0xffcc33], frequency: 60 }); // mưa pháo giấy 3 màu
+    this.add.particles(GAME_W / 2, 0, 'px', { x: { min: -GAME_W / 2, max: GAME_W / 2 }, speedY: { min: 60, max: 160 }, lifespan: 4000, tint: [0xff44cc, 0x3399ff, 0xffcc33], frequency: 60 }); // mưa pháo giấy 3 màu
     this.add.text(GAME_W / 2, 400, tr('Credit\nGame: làm cho Dlicom AI Game Jam\nSFX: Kenney.nl (CC0)\nNhạc: Juhani Junkala - 5 Action Chiptunes, Chiptune Adventures (CC0)', 'Credits\nGame: made for the Dlicom AI Game Jam\nSFX: Kenney.nl (CC0)\nMusic: Juhani Junkala - 5 Action Chiptunes, Chiptune Adventures (CC0)'), { fontFamily: FONT, fontSize: 15, color: '#aaaacc', align: 'center' }).setOrigin(0.5); // credit
     this.add.text(GAME_W / 2, 505, tr('Enter / chạm: về menu', 'Enter / tap: back to menu'), { fontFamily: FONT, fontSize: 18, color: '#ffffff' }).setOrigin(0.5); // hướng dẫn
     const back = () => { this.sound.stopAll(); this.scene.start('Menu'); }; // về menu
@@ -1296,7 +1297,7 @@ class WinScene extends Phaser.Scene { // màn chiến thắng cuối game
   }
 }
 
-const TEXT_RES = Math.min(4, Math.max(1, Math.max(window.innerWidth / GAME_W, window.innerHeight / GAME_H) * (window.devicePixelRatio || 1))); // độ phân giải vẽ chữ = cỡ thật trên màn hình
+let TEXT_RES = Math.min(4, Math.max(1, Math.max(window.innerWidth / GAME_W, window.innerHeight / GAME_H) * (window.devicePixelRatio || 1))); // độ phân giải vẽ chữ = cỡ thật trên màn hình
 const origText = Phaser.GameObjects.GameObjectFactory.prototype.text; // hàm tạo chữ gốc của Phaser
 Phaser.GameObjects.GameObjectFactory.prototype.text = function (...args) { // mọi chữ tạo ra đều vẽ nét cao
   const t = origText.apply(this, args); // tạo chữ như bình thường
@@ -1305,7 +1306,12 @@ Phaser.GameObjects.GameObjectFactory.prototype.text = function (...args) { // m�
   return t; // trả về chữ
 };
 const fontsReady = document.fonts ? Promise.race([Promise.all(['16px "Chakra Petch"', '700 16px "Chakra Petch"', '16px "Bungee"'].map(f => document.fonts.load(f))), new Promise(r => setTimeout(r, 3000))]) : Promise.resolve(); // đợi phông tối đa 3 giây
-fontsReady.catch(() => {}).then(() => { window.game = new Phaser.Game({ // khởi tạo game sau khi có phông
+function bootGame() { // khởi động game theo kích thước màn hình hiện tại
+  if (window.game && window.game.config) return; // đã chạy rồi thì thôi
+  const ratio = window.innerWidth / window.innerHeight; // tỉ lệ ngang/dọc của màn hình
+  GAME_W = Math.round(Phaser.Math.Clamp(GAME_H * ratio, 720, 1400) / 2) * 2; // nới chiều ngang cho kín màn hình, nhân vật giữ nguyên cỡ
+  TEXT_RES = Math.min(4, Math.max(1, Math.max(window.innerWidth / GAME_W, window.innerHeight / GAME_H) * (window.devicePixelRatio || 1))); // tính lại độ nét chữ
+  fontsReady.catch(() => {}).then(() => { window.game = new Phaser.Game({ // khởi tạo game sau khi có phông
   type: Phaser.AUTO, // tự chọn WebGL hoặc Canvas
   parent: 'game', // gắn vào thẻ div#game
   width: GAME_W, // chiều rộng logic
@@ -1316,3 +1322,6 @@ fontsReady.catch(() => {}).then(() => { window.game = new Phaser.Game({ // khở
   physics: { default: 'arcade', arcade: { gravity: { y: GRAVITY }, debug: false } }, // vật lý arcade có trọng lực
   scene: [MenuScene, GameScene, WinScene], // menu, cảnh chơi, màn chiến thắng
 }); });
+}
+window.bootGame = bootGame; // cho trang web gọi khi đã sẵn sàng
+if (!(('ontouchstart' in window) || navigator.maxTouchPoints > 0)) bootGame(); // máy tính: chạy ngay; điện thoại: chờ bấm PLAY và xoay ngang

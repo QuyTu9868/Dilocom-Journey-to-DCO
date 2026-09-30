@@ -35,6 +35,7 @@
     const refresh = () => { // cập nhật lớp che theo trạng thái
       startGate.classList.toggle('show', isTouch && !started); // chưa bấm chơi thì che bằng nút chơi
       rotateGate.classList.toggle('show', isTouch && started && portrait()); // đã bấm mà vẫn dọc thì nhắc xoay
+      if (isTouch && started && !portrait() && window.bootGame) setTimeout(window.bootGame, 250); // đã ngang hẳn thì khởi động game theo đúng kích thước màn hình ngang
     };
     document.getElementById('playBtn').addEventListener('click', async () => { // bấm nút chơi
       started = true; // đánh dấu đã bắt đầu

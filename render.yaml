@@ -3,6 +3,7 @@ services:
   - type: web
     name: dlicom-journey-to-dco
     runtime: static
+    autoDeploy: true
     buildCommand: ""
     staticPublishPath: .
     headers:
